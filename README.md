@@ -1,4 +1,3 @@
-kepler.js
-=========
+# Slate.js
 
-SVG library and UI framework for modern browsers. http://mathigon.io/kepler
+SVG library and UI framework for modern browsers.
