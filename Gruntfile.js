@@ -121,7 +121,7 @@ module.exports = function(grunt) {
 
         autoprefixer: {
             all: {
-                files: [{ src: 'dist/<%= pkg.name %>.css' }]
+                src: ['dist/<%= pkg.name %>.css']
             }
         },
 
@@ -137,6 +137,6 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('default', ['jshint:before', 'concat:dev', 'jshint:after', 'nodeunit:all',
-        'uglify:prod', 'less:all', 'autoprefixer:all', 'cssmin:all', 'concat:docs',
+        'uglify:prod', 'less:all', /*'autoprefixer:all',*/ 'cssmin:all', 'concat:docs',
         'markdown:docs']);
 };

@@ -5,5 +5,7 @@
     "lightbox",
     "scrollreveal",
     "slider",
-    "variables"
+    "variables",
+    "svg",
+    "draw"
 ]
