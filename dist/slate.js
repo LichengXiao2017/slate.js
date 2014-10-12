@@ -503,7 +503,7 @@ M.Lightbox = function($container, chapter) {
 
         // Trigger Updates
         function updatePage() { getScroll(); for (var i=0; i<n; ++i) updateFns[i](); }
-        $parent.scroll({ move: updatePage });
+        $parent.on('scroll', updatePage);
         M.resize(updatePage);
         updatePage();
 
