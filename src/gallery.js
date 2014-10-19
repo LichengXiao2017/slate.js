@@ -153,7 +153,7 @@ M.Gallery = function($panel, options) {
         M.$body.off('mousemove touchmove', motionMove);
         M.$body.off('mouseup mouseleave touchend touchcancel', motionEnd);
 
-        x = event.touches ? event.touches[0].clientX : event.clientX;
+        var x = event.touches ? event.touches[0].clientX : event.clientX;
         var lastDiff = lastMotionX - previousMotionX;
         var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 

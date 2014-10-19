@@ -346,7 +346,7 @@ M.Gallery = function($panel, options) {
         M.$body.off('mousemove touchmove', motionMove);
         M.$body.off('mouseup mouseleave touchend touchcancel', motionEnd);
 
-        x = event.touches ? event.touches[0].clientX : event.clientX;
+        var x = event.touches ? event.touches[0].clientX : event.clientX;
         var lastDiff = lastMotionX - previousMotionX;
         var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 
@@ -844,7 +844,7 @@ M.draw = function($svg, options) {
     var activePath = null;
 
     _this.start = function(p) {
-        if (_this.p && FM.geo.distance(_this.p, p) < 20) {
+        if (_this.p && M.geo.distance(_this.p, p) < 20) {
             activePath.addPoint(p);
 
         } else {
@@ -862,7 +862,7 @@ M.draw = function($svg, options) {
     };
 
     _this.addPoint = function(p) {
-        if (FM.geo.manhatten(_this.p, p) > 4) {
+        if (M.geo.manhatten(_this.p, p) > 4) {
             activePath.addPoint(p);
             _this.p = p;
             if (options.onIntersect) _this.checkForIntersects();
@@ -905,7 +905,7 @@ M.draw.prototype.checkForIntersects = function() {
     for (var i=0; i<this.paths.length-1; ++i) {
         var l = this.paths[i].points.length;
         for (var j=1; j<l-2; ++j) {
-            var t = FM.geo.intersect(a1, a2, this.paths[i].points[j], this.paths[i].points[j+1]);
+            var t = M.geo.intersect(a1, a2, this.paths[i].points[j], this.paths[i].points[j+1]);
             if (t) {
                 this.options.onIntersect(t, path, this.paths[i]);
                 return;
