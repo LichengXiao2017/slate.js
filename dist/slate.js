@@ -442,7 +442,7 @@ M.Lightbox = function($container, chapter) {
         // Scroll parent
         var isWindow = !$parent;
         var parentEl =  isWindow ? window.document.documentElement : $parent.$el;
-        if (isWindow) $parent = M.$window;
+        if (isWindow) $parent = M.$body;
 
         // Viewport height reference
         var viewportHeight;
