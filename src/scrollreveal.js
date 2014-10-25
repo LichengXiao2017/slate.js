@@ -8,22 +8,17 @@
 
     // M.scrollReveal($$('[scroll-reveal]'));
 
-    M.scrollReveal = function($els, $parent) {
-
-        // Scroll parent
-        var isWindow = !$parent;
-        var parentEl =  isWindow ? window.document.documentElement : $parent.$el;
-        if (isWindow) $parent = M.$body;
+    M.scrollReveal = function($els) {
 
         // Viewport height reference
         var viewportHeight;
-        function getHeight() { viewportHeight = isWindow ? window.innerHeight : parentEl.clientHeight; }
+        function getHeight() { viewportHeight = window.innerHeight; }
         M.resize(getHeight);
         getHeight();
 
         // Scroll position reference;
         var viewportScroll;
-        function getScroll() { viewportScroll = isWindow ? window.pageYOffset : parentEl.scrollTop; }
+        function getScroll() { viewportScroll = window.pageYOffset; }
 
         // Check if an element is visible
         function isInViewport($el, factor) {
