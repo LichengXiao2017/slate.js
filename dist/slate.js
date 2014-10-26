@@ -437,22 +437,17 @@ M.Lightbox = function($container, chapter) {
 
     // M.scrollReveal($$('[scroll-reveal]'));
 
-    M.scrollReveal = function($els, $parent) {
-
-        // Scroll parent
-        var isWindow = !$parent;
-        var parentEl =  isWindow ? window.document.documentElement : $parent.$el;
-        if (isWindow) $parent = M.$body;
+    M.scrollReveal = function($els) {
 
         // Viewport height reference
         var viewportHeight;
-        function getHeight() { viewportHeight = isWindow ? window.innerHeight : parentEl.clientHeight; }
+        function getHeight() { viewportHeight = window.innerHeight; }
         M.resize(getHeight);
         getHeight();
 
         // Scroll position reference;
         var viewportScroll;
-        function getScroll() { viewportScroll = isWindow ? window.pageYOffset : parentEl.scrollTop; }
+        function getScroll() { viewportScroll = window.pageYOffset; }
 
         // Check if an element is visible
         function isInViewport($el, factor) {
@@ -469,10 +464,10 @@ M.Lightbox = function($container, chapter) {
 
             var axis      = M.isOneOf(options[0], 'left', 'right') ? 'X' : 'Y';
             var direction = M.isOneOf(options[0], 'top', 'left') ? '-' : '';
-            var distance  = options[1] || '24px';
-            var duration  = options[2] || '.5s';
-            var delay     = options[3] || '0s';
-            var factor    = M.isNaN(+options[4]) ? 0.25 : +options[4];
+            var factor    = M.isNaN(+options[1]) ? 0.2 : +options[1];
+            var distance  = options[2] || '40px';
+            var duration  = options[3] || '.5s';
+            var delay     = options[4] || '0s';
 
             function show() {
                 isShown = true;
@@ -503,9 +498,10 @@ M.Lightbox = function($container, chapter) {
 
         // Trigger Updates
         function updatePage() { getScroll(); for (var i=0; i<n; ++i) updateFns[i](); }
-        $parent.scroll(updatePage);
+        M.$body.scroll(updatePage);
         M.resize(updatePage);
         updatePage();
+        setTimeout(function() { updatePage(); }, 500);
 
     };
 
