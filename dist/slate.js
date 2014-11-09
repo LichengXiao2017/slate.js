@@ -459,7 +459,7 @@ M.Lightbox = function($container, chapter) {
 
         // Initialise element and
         function makeElement($el) {
-            var isShown = false;
+            var isShown = true;
             var options = ($el.attr('data-scroll') || '').split('|');
 
             var axis      = M.isOneOf(options[0], 'left', 'right') ? 'X' : 'Y';
@@ -480,9 +480,6 @@ M.Lightbox = function($container, chapter) {
                 $el.css('opacity', '0');
                 $el.transform('translate' + axis + '(' + direction + distance + ')');
             }
-
-            hide();
-            M.redraw();
 
             $el.transition(['opacity', duration, delay, ',', M.prefix('transform'), duration, delay].join(' '));
 
