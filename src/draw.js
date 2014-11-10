@@ -4,7 +4,7 @@
 // =================================================================================================
 
 
-M.draw = function($svg, options) {
+M.Draw = function($svg, options) {
 
     var _this = this;
 
@@ -67,7 +67,7 @@ M.draw = function($svg, options) {
     });
 };
 
-M.draw.prototype.checkForIntersects = function() {
+M.Draw.prototype.checkForIntersects = function() {
 
     if (this.paths.length <= 1) return;
     var path = this.paths.last();
@@ -86,12 +86,12 @@ M.draw.prototype.checkForIntersects = function() {
     }
 };
 
-M.draw.prototype.stop = function() {
+M.Draw.prototype.stop = function() {
     this.drawing = false;
     this.p = null;
 };
 
-M.draw.prototype.clear = function() {
+M.Draw.prototype.clear = function() {
     this.paths.each(function(path) { path.remove(); });
     this.paths = [];
 };
