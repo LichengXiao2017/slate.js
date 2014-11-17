@@ -8,6 +8,8 @@
 
 M.scrollReveal = function($els) {
 
+    if (M.browser.isMobile && M.browser.width < 800 && M.browser.height < 800) return;
+
     // Viewport height reference
     var viewportHeight;
     function getHeight() { viewportHeight = window.innerHeight; }
