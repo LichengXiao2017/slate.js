@@ -46,8 +46,8 @@ M.Draggable = M.Class.extend({
         var motionMove = function(e) {
             e.preventDefault();
             var newPosition = getPosn(e);
-            var x = (position[0] + newPosition[0] - dragStart[0]).bound(0, width);
-            var y = (position[1] + newPosition[1] - dragStart[1]).bound(0, height);
+            var x = M.bound(position[0] + newPosition[0] - dragStart[0], 0, width);
+            var y = M.bound(position[1] + newPosition[1] - dragStart[1], 0, height);
             draw(x, y);
         };
 
@@ -58,8 +58,8 @@ M.Draggable = M.Class.extend({
             if (newPosition[0] === dragStart[0] && newPosition[1] === dragStart[1]) {
                 _this.trigger('click');
             } else {
-                var x = (position[0] + newPosition[0] - dragStart[0]).bound(0, width);
-                var y = (position[1] + newPosition[1] - dragStart[1]).bound(0, height);
+                var x = M.bound(position[0] + newPosition[0] - dragStart[0], 0, width);
+                var y = M.bound(position[1] + newPosition[1] - dragStart[1], 0, height);
                 position = [x, y];
                 _this.trigger('end');
             }
@@ -118,7 +118,7 @@ M.Slider = M.Class.extend({
 
         this.play = function() {
             cancelPlay = false;
-            $knob.pulse();
+            $knob.pulseDown();
             animRender();
         };
 

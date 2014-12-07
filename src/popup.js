@@ -4,16 +4,16 @@
 // =================================================================================================
 
 
-M.Bubble = function($popup, chapter) {
+M.Popup = function($popup, chapter) {
 
     // TODO onopen(), onclose() functions
 
     var _this = this;
 
-    var $bubble = $C('popup-bubble',$popup)[0];
+    var $bubble = $C('popup-bubble',$popup);
     if (!$bubble) return;
 
-    var $bubbleBox = $C('bubble-box',$bubble)[0];
+    var $bubbleBox = $C('bubble-box',$bubble);
     $N('span', {'class': 'bubble-arrow'}, $bubble);
 
     _this.open = function() {
@@ -31,10 +31,10 @@ M.Bubble = function($popup, chapter) {
         var pageRight = M.browser.width;
 
         if (left < pageLeft + 10)
-            $bubbleBox.transformX(pageLeft + 10 - left);
+            $bubbleBox.translateX(pageLeft + 10 - left);
 
         if (right > pageRight - 54)
-            $bubbleBox.transformX(pageRight - 54 - right);
+            $bubbleBox.translateX(pageRight - 54 - right);
 
         M.redraw();
         if (top < 27 ) { chapter.scrollBy(top - 27); }

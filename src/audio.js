@@ -8,23 +8,23 @@ M.audio = {
     files: {},
     playing: null,
     load: function(src, id) {
-        M.Audio.files[id] = new Audio(src);
-        M.Audio.files[id].load();
-        M.Audio.files[id].addEventListener('timeupdate', function() {
-            if (M.Audio.playing) M.Audio.playing.update();
+        M.audio.files[id] = new Audio(src);
+        M.audio.files[id].load();
+        M.audio.files[id].addEventListener('timeupdate', function() {
+            if (M.audio.playing) M.audio.playing.update();
         });
-        return M.Audio.files[id];
+        return M.audio.files[id];
     }
 };
 
 M.audio.Chunk = M.Class.extend({
 
     init: function(file, times) {
-        if (M.isString(times)) times = times.split('|').toNumbers();
+        if (M.isString(times)) times = M.map(parseFloat, times.split('|'));
         this.times = times;
         this.currentTime = times[0];
         this.duration = times[1] - times[0];
-        this.player = M.Audio.files[file] || M.Audio.load(file, Math.floor(Math.random()*10000));
+        this.player = M.audio.files[file] || M.audio.load(file, Math.floor(Math.random()*10000));
         this.ended = false;
     },
 
@@ -36,8 +36,8 @@ M.audio.Chunk = M.Class.extend({
             return;
         }
 
-        if (M.Audio.playing) M.Audio.playing.pause();
-        M.Audio.playing = this;
+        if (M.audio.playing) M.audio.playing.pause();
+        M.audio.playing = this;
 
         this.ended = false;
         this.player.currentTime = this.currentTime;
@@ -46,7 +46,7 @@ M.audio.Chunk = M.Class.extend({
     },
 
     pause: function() {
-        if (M.Audio.playing === this) this.player.pause();
+        if (M.audio.playing === this) this.player.pause();
         this.trigger('pause');
     },
 
@@ -56,7 +56,7 @@ M.audio.Chunk = M.Class.extend({
     },
 
     reset: function() {
-        if (M.Audio.playing === this) this.player.pause();
+        if (M.audio.playing === this) this.player.pause();
         if (this.player.readyState) this.currentTime = this.times[0];
         this.ended = true;
         this.trigger('reset');
@@ -65,7 +65,7 @@ M.audio.Chunk = M.Class.extend({
     update: function() {
         if (this.ended) return;
 
-        if (M.Audio.playing === this)
+        if (M.audio.playing === this)
             this.currentTime = this.player.currentTime;
 
         if (this.currentTime >= this.times[1]) {

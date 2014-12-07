@@ -1,8 +1,8 @@
 [
     "audio",
-    "bubble",
+    "popup",
     "gallery",
-    "lightbox",
+    "frame",
     "scrollreveal",
     "slider",
     "variables",

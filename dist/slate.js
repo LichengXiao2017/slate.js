@@ -7,23 +7,23 @@ M.audio = {
     files: {},
     playing: null,
     load: function(src, id) {
-        M.Audio.files[id] = new Audio(src);
-        M.Audio.files[id].load();
-        M.Audio.files[id].addEventListener('timeupdate', function() {
-            if (M.Audio.playing) M.Audio.playing.update();
+        M.audio.files[id] = new Audio(src);
+        M.audio.files[id].load();
+        M.audio.files[id].addEventListener('timeupdate', function() {
+            if (M.audio.playing) M.audio.playing.update();
         });
-        return M.Audio.files[id];
+        return M.audio.files[id];
     }
 };
 
 M.audio.Chunk = M.Class.extend({
 
     init: function(file, times) {
-        if (M.isString(times)) times = times.split('|').toNumbers();
+        if (M.isString(times)) times = M.map(parseFloat, times.split('|'));
         this.times = times;
         this.currentTime = times[0];
         this.duration = times[1] - times[0];
-        this.player = M.Audio.files[file] || M.Audio.load(file, Math.floor(Math.random()*10000));
+        this.player = M.audio.files[file] || M.audio.load(file, Math.floor(Math.random()*10000));
         this.ended = false;
     },
 
@@ -35,8 +35,8 @@ M.audio.Chunk = M.Class.extend({
             return;
         }
 
-        if (M.Audio.playing) M.Audio.playing.pause();
-        M.Audio.playing = this;
+        if (M.audio.playing) M.audio.playing.pause();
+        M.audio.playing = this;
 
         this.ended = false;
         this.player.currentTime = this.currentTime;
@@ -45,7 +45,7 @@ M.audio.Chunk = M.Class.extend({
     },
 
     pause: function() {
-        if (M.Audio.playing === this) this.player.pause();
+        if (M.audio.playing === this) this.player.pause();
         this.trigger('pause');
     },
 
@@ -55,7 +55,7 @@ M.audio.Chunk = M.Class.extend({
     },
 
     reset: function() {
-        if (M.Audio.playing === this) this.player.pause();
+        if (M.audio.playing === this) this.player.pause();
         if (this.player.readyState) this.currentTime = this.times[0];
         this.ended = true;
         this.trigger('reset');
@@ -64,7 +64,7 @@ M.audio.Chunk = M.Class.extend({
     update: function() {
         if (this.ended) return;
 
-        if (M.Audio.playing === this)
+        if (M.audio.playing === this)
             this.currentTime = this.player.currentTime;
 
         if (this.currentTime >= this.times[1]) {
@@ -135,16 +135,16 @@ M.speechRecognition = function() {
     };
 };
 
-M.Bubble = function($popup, chapter) {
+M.Popup = function($popup, chapter) {
 
     // TODO onopen(), onclose() functions
 
     var _this = this;
 
-    var $bubble = $C('popup-bubble',$popup)[0];
+    var $bubble = $C('popup-bubble',$popup);
     if (!$bubble) return;
 
-    var $bubbleBox = $C('bubble-box',$bubble)[0];
+    var $bubbleBox = $C('bubble-box',$bubble);
     $N('span', {'class': 'bubble-arrow'}, $bubble);
 
     _this.open = function() {
@@ -162,10 +162,10 @@ M.Bubble = function($popup, chapter) {
         var pageRight = M.browser.width;
 
         if (left < pageLeft + 10)
-            $bubbleBox.transformX(pageLeft + 10 - left);
+            $bubbleBox.translateX(pageLeft + 10 - left);
 
         if (right > pageRight - 54)
-            $bubbleBox.transformX(pageRight - 54 - right);
+            $bubbleBox.translateX(pageRight - 54 - right);
 
         M.redraw();
         if (top < 27 ) { chapter.scrollBy(top - 27); }
@@ -211,7 +211,7 @@ M.Gallery = function($panel, options) {
 
     var width, slidesPerPage, slideWidth;
     var activeIndex = 0;
-    var transformX = 0;
+    var translateX = 0;
 
     //$N('div', { class: 'gallery-shadow-left' }, $box);
     //$N('div', { class: 'gallery-shadow-right' }, $box);
@@ -232,11 +232,11 @@ M.Gallery = function($panel, options) {
     // RESIZE EVENTS -------------------------------------------------------------------------------
 
     var setPosition = function(offset) {
-        transformX = offset;
-        $panel.transformX(offset);
+        translateX = offset;
+        $panel.translateX(offset);
         /*if (options.opacity) $slides.each(function($s, i) {
             var x = ((i+1)*slideWidth + offset) / slideWidth;
-            $s.css('opacity', M.easing('quad', 0.4 + 0.6 * x.bound(0,1) ));
+            $s.css('opacity', M.easing('quad', 0.4 + 0.6 * M.bound(x, 0,1) ));
         });*/
     };
 
@@ -281,8 +281,8 @@ M.Gallery = function($panel, options) {
     var startAnimationTo = function(newIndex) {
         animCancel = false;
         animT = 0;
-        animStart = transformX;
-        animDistance = -newIndex * slideWidth - transformX;
+        animStart = translateX;
+        animDistance = -newIndex * slideWidth - translateX;
         animStartTime = M.now();
         makeActive(newIndex);
         animRender();
@@ -291,7 +291,7 @@ M.Gallery = function($panel, options) {
     var next = function() {
         animTiming = 'quad';
         if (activeIndex < slidesCount - slidesPerPage) {
-            $next.pulse();
+            $next.pulseDown();
             startAnimationTo(activeIndex+1);
         }
     };
@@ -299,7 +299,7 @@ M.Gallery = function($panel, options) {
     var back = function() {
         animTiming = 'quad';
         if (activeIndex > 0) {
-            $back.pulse();
+            $back.pulseDown();
             startAnimationTo(activeIndex-1);
         }
     };
@@ -318,7 +318,7 @@ M.Gallery = function($panel, options) {
         M.$body.on('mousemove touchmove', motionMove);
         M.$body.on('mouseup mouseleave touchend touchcancel', motionEnd);
         animCancel = true;
-        motionStartPosn = transformX;
+        motionStartPosn = translateX;
         pointerStart = event.touches ? event.touches[0].clientX : event.clientX;
         lastMotionX = previousMotionX = pointerStart;
     };
@@ -351,7 +351,7 @@ M.Gallery = function($panel, options) {
         var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 
         animTiming = 'quad-out';
-        startAnimationTo(Math.round(-transformX/slideWidth-shift).bound(0, slidesCount - slidesPerPage));
+        startAnimationTo(M.bound(Math.round(-translateX/slideWidth - shift), 0, slidesCount - slidesPerPage));
     };
 
     $wrapper.on('mousedown touchstart', motionStart);
@@ -366,6 +366,26 @@ M.Gallery = function($panel, options) {
         back: back
     };
 };
+
+M.Frame = M.Class.extend({
+    init: function($el) {
+        var width = $el.width('border');
+        var height = $el.height('border');
+        var ratio = height/width;
+
+        var $wrap = $N('div', { class: 'frame-wrap'});
+        $el.wrap($wrap);
+
+        function resize() {
+            var w = $wrap.width('border');
+            var h = w * ratio;
+            $wrap.css('height', h+'px');
+            $el.transform('scale(' + w/width + ') translateZ(0)');
+        }
+
+        M.resize(resize);
+    }
+});
 
 M.Lightbox = function($container, chapter) {
 
@@ -544,8 +564,8 @@ M.Draggable = M.Class.extend({
         var motionMove = function(e) {
             e.preventDefault();
             var newPosition = getPosn(e);
-            var x = (position[0] + newPosition[0] - dragStart[0]).bound(0, width);
-            var y = (position[1] + newPosition[1] - dragStart[1]).bound(0, height);
+            var x = M.bound(position[0] + newPosition[0] - dragStart[0], 0, width);
+            var y = M.bound(position[1] + newPosition[1] - dragStart[1], 0, height);
             draw(x, y);
         };
 
@@ -556,8 +576,8 @@ M.Draggable = M.Class.extend({
             if (newPosition[0] === dragStart[0] && newPosition[1] === dragStart[1]) {
                 _this.trigger('click');
             } else {
-                var x = (position[0] + newPosition[0] - dragStart[0]).bound(0, width);
-                var y = (position[1] + newPosition[1] - dragStart[1]).bound(0, height);
+                var x = M.bound(position[0] + newPosition[0] - dragStart[0], 0, width);
+                var y = M.bound(position[1] + newPosition[1] - dragStart[1], 0, height);
                 position = [x, y];
                 _this.trigger('end');
             }
@@ -616,7 +636,7 @@ M.Slider = M.Class.extend({
 
         this.play = function() {
             cancelPlay = false;
-            $knob.pulse();
+            $knob.pulseDown();
             animRender();
         };
 

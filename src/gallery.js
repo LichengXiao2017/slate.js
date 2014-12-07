@@ -18,7 +18,7 @@ M.Gallery = function($panel, options) {
 
     var width, slidesPerPage, slideWidth;
     var activeIndex = 0;
-    var transformX = 0;
+    var translateX = 0;
 
     //$N('div', { class: 'gallery-shadow-left' }, $box);
     //$N('div', { class: 'gallery-shadow-right' }, $box);
@@ -39,11 +39,11 @@ M.Gallery = function($panel, options) {
     // RESIZE EVENTS -------------------------------------------------------------------------------
 
     var setPosition = function(offset) {
-        transformX = offset;
-        $panel.transformX(offset);
+        translateX = offset;
+        $panel.translateX(offset);
         /*if (options.opacity) $slides.each(function($s, i) {
             var x = ((i+1)*slideWidth + offset) / slideWidth;
-            $s.css('opacity', M.easing('quad', 0.4 + 0.6 * x.bound(0,1) ));
+            $s.css('opacity', M.easing('quad', 0.4 + 0.6 * M.bound(x, 0,1) ));
         });*/
     };
 
@@ -88,8 +88,8 @@ M.Gallery = function($panel, options) {
     var startAnimationTo = function(newIndex) {
         animCancel = false;
         animT = 0;
-        animStart = transformX;
-        animDistance = -newIndex * slideWidth - transformX;
+        animStart = translateX;
+        animDistance = -newIndex * slideWidth - translateX;
         animStartTime = M.now();
         makeActive(newIndex);
         animRender();
@@ -98,7 +98,7 @@ M.Gallery = function($panel, options) {
     var next = function() {
         animTiming = 'quad';
         if (activeIndex < slidesCount - slidesPerPage) {
-            $next.pulse();
+            $next.pulseDown();
             startAnimationTo(activeIndex+1);
         }
     };
@@ -106,7 +106,7 @@ M.Gallery = function($panel, options) {
     var back = function() {
         animTiming = 'quad';
         if (activeIndex > 0) {
-            $back.pulse();
+            $back.pulseDown();
             startAnimationTo(activeIndex-1);
         }
     };
@@ -125,7 +125,7 @@ M.Gallery = function($panel, options) {
         M.$body.on('mousemove touchmove', motionMove);
         M.$body.on('mouseup mouseleave touchend touchcancel', motionEnd);
         animCancel = true;
-        motionStartPosn = transformX;
+        motionStartPosn = translateX;
         pointerStart = event.touches ? event.touches[0].clientX : event.clientX;
         lastMotionX = previousMotionX = pointerStart;
     };
@@ -158,7 +158,7 @@ M.Gallery = function($panel, options) {
         var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 
         animTiming = 'quad-out';
-        startAnimationTo(Math.round(-transformX/slideWidth-shift).bound(0, slidesCount - slidesPerPage));
+        startAnimationTo(M.bound(Math.round(-translateX/slideWidth - shift), 0, slidesCount - slidesPerPage));
     };
 
     $wrapper.on('mousedown touchstart', motionStart);
