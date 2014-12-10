@@ -1,6 +1,6 @@
 # Slate.js
 
-TODO
+Collection of useful UI and media classes: audio and speech recognition, draggable, slider and gallery, SVG library, interactive variables and more.
 
 
 ## Quick start
