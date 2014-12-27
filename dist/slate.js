@@ -197,175 +197,179 @@ M.Popup = function($popup, chapter) {
     $popup.click(click);
 };
 
-M.Gallery = function($panel, options) {
-    if (!options) options = {};
+M.Gallery = M.Class.extend({
 
-    var $wrapper = $N('div', { class: 'gallery-wrapper' });
-    var $box = $N('div', { class: 'gallery-box' });
-    $panel.wrap($wrapper);
-    $wrapper.wrap($box);
-    var $slides = $panel.children();
+    init: function($panel, options) {
+        if (!options) options = {};
+        var _this = this;
 
-    var slidesCount = $slides.length;
-    var staticSlideWidth = $panel.attr('data-slide-width') || null;
+        var $wrapper = $N('div', { class: 'gallery-wrapper' });
+        var $box = $N('div', { class: 'gallery-box' });
+        $panel.wrap($wrapper);
+        $wrapper.wrap($box);
+        var $slides = $panel.children();
 
-    var width, slidesPerPage, slideWidth;
-    var activeIndex = 0;
-    var translateX = 0;
+        var slidesCount = $slides.length;
+        var staticSlideWidth = $panel.attr('data-slide-width') || null;
 
-    //$N('div', { class: 'gallery-shadow-left' }, $box);
-    //$N('div', { class: 'gallery-shadow-right' }, $box);
+        var width, slidesPerPage, slideWidth;
+        var activeIndex = 0;
+        var translateX = 0;
 
-    var $next = $N('div', { class: 'gallery-next' }, $box);
-    var $back = $N('div', { class: 'gallery-back' }, $box);
-    $N('div', { class: 'icon' }, $next);
-    $N('div', { class: 'icon' }, $back);
+        //$N('div', { class: 'gallery-shadow-left' }, $box);
+        //$N('div', { class: 'gallery-shadow-right' }, $box);
 
-    var $dotsBox = $N('div', { class: 'gallery-dots' }, $box);
-    var $dots = [];
+        var $next = $N('div', { class: 'gallery-next' }, $box);
+        var $back = $N('div', { class: 'gallery-back' }, $box);
+        $N('div', { class: 'icon' }, $next);
+        $N('div', { class: 'icon' }, $back);
 
-    $slides.each(function($s) {
-        $s.addClass('gallery-slide');
-        $dots.push($N('div', { class: 'gallery-dot' }, $dotsBox));
-    });
+        var $dotsBox = $N('div', { class: 'gallery-dots' }, $box);
+        var $dots = [];
 
-    // RESIZE EVENTS -------------------------------------------------------------------------------
-
-    var setPosition = function(offset) {
-        translateX = offset;
-        $panel.translateX(offset);
-        /*if (options.opacity) $slides.each(function($s, i) {
-            var x = ((i+1)*slideWidth + offset) / slideWidth;
-            $s.css('opacity', M.easing('quad', 0.4 + 0.6 * M.bound(x, 0,1) ));
-        });*/
-    };
-
-    var makeActive = function(newIndex) {
-        activeIndex = newIndex;
-        $dots.each(function($d, i) {
-            $d.setClass('on', i >= newIndex && i < newIndex + slidesPerPage);
+        $slides.each(function($s) {
+            $s.addClass('gallery-slide');
+            $dots.push($N('div', { class: 'gallery-dot' }, $dotsBox));
         });
-        if (options.callback) options.callback(newIndex);
-        $next.setClass('disabled', newIndex === slidesCount - slidesPerPage);
-        $back.setClass('disabled', newIndex === 0);
-    };
 
-    var resize = function() {
-        width = $wrapper.width('border');
-        slidesPerPage = staticSlideWidth ? Math.ceil(width/staticSlideWidth) : 1;
-        slideWidth = width / slidesPerPage;
+        // RESIZE EVENTS -------------------------------------------------------------------------------
 
-        $slides.each(function($slide) { $slide.css('width', slideWidth+'px'); });
-        $panel.css('width', slidesCount*slideWidth+'px');
-        setPosition(-activeIndex * slideWidth);
-        makeActive(activeIndex);
-    };
+        var setPosition = function(offset) {
+            translateX = offset;
+            $panel.translateX(offset);
+            _this.trigger('move', offset);
+            /*if (options.opacity) $slides.each(function($s, i) {
+                var x = ((i+1)*slideWidth + offset) / slideWidth;
+                $s.css('opacity', M.easing('quad', 0.4 + 0.6 * M.bound(x, 0,1) ));
+            });*/
+        };
 
-    // AUTOMATIC SCROLLING -------------------------------------------------------------------------
+        var makeActive = function(newIndex) {
+            activeIndex = newIndex;
+            $dots.each(function($d, i) {
+                $d.setClass('on', i >= newIndex && i < newIndex + slidesPerPage);
+            });
+            if (options.callback) options.callback(newIndex);
+            $next.setClass('disabled', newIndex === slidesCount - slidesPerPage);
+            $back.setClass('disabled', newIndex === 0);
+            _this.trigger('change', newIndex);
+        };
 
-    var animTiming = 'quad';
-    var animDuration = 500;
-    var animT, animStart, animDistance, animStartTime;
-    var animCancel = false;
+        var resize = function() {
+            width = $wrapper.width('border');
+            slidesPerPage = staticSlideWidth ? Math.ceil(width/staticSlideWidth) : 1;
+            slideWidth = width / slidesPerPage;
 
-    var animSetPosition = function() {
-        animT = M.now() - animStartTime;
-        setPosition(animStart + animDistance * M.easing(animTiming, animT / animDuration));
-    };
+            $slides.each(function($slide) { $slide.css('width', slideWidth+'px'); });
+            $panel.css('width', slidesCount*slideWidth+'px');
+            setPosition(-activeIndex * slideWidth);
+            makeActive(activeIndex);
+        };
 
-    var animRender = function() {
-        if (!animCancel && animT < animDuration) M.animationFrame(animRender);
-        animSetPosition();
-    };
+        // AUTOMATIC SCROLLING -------------------------------------------------------------------------
 
-    var startAnimationTo = function(newIndex) {
-        animCancel = false;
-        animT = 0;
-        animStart = translateX;
-        animDistance = -newIndex * slideWidth - translateX;
-        animStartTime = M.now();
-        makeActive(newIndex);
-        animRender();
-    };
+        var animTiming = 'quad';
+        var animDuration = 500;
+        var animT, animStart, animDistance, animStartTime;
+        var animCancel = false;
 
-    var next = function() {
-        animTiming = 'quad';
-        if (activeIndex < slidesCount - slidesPerPage) {
-            $next.pulseDown();
-            startAnimationTo(activeIndex+1);
-        }
-    };
+        var animSetPosition = function() {
+            animT = M.now() - animStartTime;
+            setPosition(animStart + animDistance * M.easing(animTiming, animT / animDuration));
+        };
 
-    var back = function() {
-        animTiming = 'quad';
-        if (activeIndex > 0) {
-            $back.pulseDown();
-            startAnimationTo(activeIndex-1);
-        }
-    };
+        var animRender = function() {
+            if (!animCancel && animT < animDuration) M.animationFrame(animRender);
+            animSetPosition();
+        };
 
-    $next.click(next);
-    $back.click(back);
+        var startAnimationTo = function(newIndex) {
+            animCancel = false;
+            animT = 0;
+            animStart = translateX;
+            animDistance = -newIndex * slideWidth - translateX;
+            animStartTime = M.now();
+            makeActive(newIndex);
+            animRender();
+        };
 
-    // TOUCH AND MOUSE EVENTS ----------------------------------------------------------------------
+        var next = function() {
+            animTiming = 'quad';
+            if (activeIndex < slidesCount - slidesPerPage) {
+                $next.pulseDown();
+                startAnimationTo(activeIndex+1);
+            }
+        };
 
-    var motionStartPosn = null;
-    var pointerStart = null;
-    var previousMotionX = null;
-    var lastMotionX = null;
+        var back = function() {
+            animTiming = 'quad';
+            if (activeIndex > 0) {
+                $back.pulseDown();
+                startAnimationTo(activeIndex-1);
+            }
+        };
 
-    var motionStart = function(e) {
-        M.$body.on('mousemove touchmove', motionMove);
-        M.$body.on('mouseup mouseleave touchend touchcancel', motionEnd);
-        animCancel = true;
-        motionStartPosn = translateX;
-        pointerStart = event.touches ? event.touches[0].clientX : event.clientX;
-        lastMotionX = previousMotionX = pointerStart;
-    };
+        $next.click(next);
+        $back.click(back);
 
-    var motionMove = function(e) {
-        e.preventDefault();
+        // TOUCH AND MOUSE EVENTS ----------------------------------------------------------------------
 
-        var x = event.touches ? event.touches[0].clientX : event.clientX;
-        previousMotionX = lastMotionX;
-        lastMotionX = x;
-        var newPosition = motionStartPosn - pointerStart + x;
-        var maxScroll = -(slidesCount - slidesPerPage) * slideWidth;
+        var motionStartPosn = null;
+        var pointerStart = null;
+        var previousMotionX = null;
+        var lastMotionX = null;
 
-        // Add resistance at ends of slider
-        if (newPosition > 0) {
-            setPosition(newPosition/4);
-        } else if (newPosition < maxScroll) {
-            setPosition(maxScroll + (newPosition - maxScroll)/4);
-        } else {
-            setPosition(newPosition);
-        }
-    };
+        var motionStart = function(e) {
+            M.$body.on('mousemove touchmove', motionMove);
+            M.$body.on('mouseup mouseleave touchend touchcancel', motionEnd);
+            animCancel = true;
+            motionStartPosn = translateX;
+            pointerStart = event.touches ? event.touches[0].clientX : event.clientX;
+            lastMotionX = previousMotionX = pointerStart;
+        };
 
-    var motionEnd = function(e) {
-        M.$body.off('mousemove touchmove', motionMove);
-        M.$body.off('mouseup mouseleave touchend touchcancel', motionEnd);
+        var motionMove = function(e) {
+            e.preventDefault();
 
-        var x = event.touches ? event.touches[0].clientX : event.clientX;
-        var lastDiff = lastMotionX - previousMotionX;
-        var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
+            var x = event.touches ? event.touches[0].clientX : event.clientX;
+            previousMotionX = lastMotionX;
+            lastMotionX = x;
+            var newPosition = motionStartPosn - pointerStart + x;
+            var maxScroll = -(slidesCount - slidesPerPage) * slideWidth;
 
-        animTiming = 'quad-out';
-        startAnimationTo(M.bound(Math.round(-translateX/slideWidth - shift), 0, slidesCount - slidesPerPage));
-    };
+            // Add resistance at ends of slider
+            if (newPosition > 0) {
+                setPosition(newPosition/4);
+            } else if (newPosition < maxScroll) {
+                setPosition(maxScroll + (newPosition - maxScroll)/4);
+            } else {
+                setPosition(newPosition);
+            }
+        };
 
-    $wrapper.on('mousedown touchstart', motionStart);
+        var motionEnd = function(e) {
+            M.$body.off('mousemove touchmove', motionMove);
+            M.$body.off('mouseup mouseleave touchend touchcancel', motionEnd);
 
-    // ---------------------------------------------------------------------------------------------
+            var x = event.touches ? event.touches[0].clientX : event.clientX;
+            var lastDiff = lastMotionX - previousMotionX;
+            var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 
-    resize();
-    M.resize(resize);
+            animTiming = 'quad-out';
+            startAnimationTo(M.bound(Math.round(-translateX/slideWidth - shift), 0, slidesCount - slidesPerPage));
+        };
 
-    return {
-        next: next,
-        back: back
-    };
-};
+        $wrapper.on('mousedown touchstart', motionStart);
+
+        // ---------------------------------------------------------------------------------------------
+
+        resize();
+        M.resize(resize);
+
+        this.next = next;
+        this.back = back;
+    }
+});
 
 M.Frame = M.Class.extend({
     init: function($el) {
