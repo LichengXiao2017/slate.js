@@ -4,40 +4,35 @@
 // =================================================================================================
 
 
-M.svg = {};
-
-M.svg.el = function(type, attributes, parent) {
-    var _this = this;
-    var svgns = 'http://www.w3.org/2000/svg';
-    this.$el = document.createElementNS(svgns, type);
-    this.data = {};
-    M.each(attributes, function(val, key){ _this.$el.setAttribute(key, val); });
-    if (parent) parent.append(this);
-};
-
-M.inherit(M.svg.el, M.$);
-
-M.svg.el.prototype.setPoints = function(p) {
-    this.attr('d', p.length ? 'M' + p.each(function(x){ return x.join(','); }).join('L') : '' );
+M.$.prototype.setPoints = function(p) {
+    this.attr('d', p.length ? 'M' + p.each(function(x){ return x.x + ',' + x.y; }).join('L') : '' );
     this.points = p;
 };
 
-M.svg.el.prototype.addPoint = function(p) {
-    this.attr('d', this.attr('d') + ' L '+p.join(',') );
+M.$.prototype.addPoint = function(p) {
+    this.getPoints();
+    this.attr('d', this.attr('d') + ' L ' + p.x + ',' + p.y);
     this.points.push(p);
 };
 
-M.svg.el.prototype.getPoints = function() {
-    var points = this.$el.attr('d').replace('M','').split('L');
-    return points.each(function(x){ return x.split(',').toNumbers(); });
+M.$.prototype.getPoints = function() {
+    if (!this.points) {
+        var points = this.$el.attr('d').replace('M','').split('L');
+        this.points = points.each(function(x){
+            p = x.split(',');
+            return new M.geo.Point(p[0], p[1]);
+        });
+    }
+    return this.points;
 };
 
+// =================================================================================================
+
 M.piechart = function(percentage, radius, colour) {
-    var str;
 
+    // Checkmark when completed
     if (percentage >= 1) {
-
-        str = [
+        return [
             '<svg width="',2*radius,'" height="',2*radius,'">',
             '<path fill="',colour,'" stroke="none" d="M',
             radius,',0C',radius*0.5,',0,0,',radius*0.5,',0,',radius,'s',
@@ -48,21 +43,16 @@ M.piechart = function(percentage, radius, colour) {
             radius*34.2/50,'-',radius*32.6/50,'l',radius*3.5/50,',',radius*3.5/50,'L',
             radius*44.6/50,',',radius*76.1/50,'z"/>','</svg>'
         ].join('');
-
-    } else {
-
-        var x = radius + radius * Math.sin(percentage * 2 * Math.PI);
-        var y = radius - radius * Math.cos(percentage * 2 * Math.PI);
-
-        str = [
-            '<svg width="',2*radius,'" height="',2*radius,'">',
-            '<circle cx="',radius,'" cy="',radius,'" r="',radius-0.5,'" stroke="',colour,
-            '" stroke-width="1" fill="transparent"/>','<path d="M ',radius,' ',radius,' L ',radius,
-            ' 0 A ',radius,' ',radius,' 0 '+(percentage>0.5?'1':'0')+' 1 '+x+' '+y+' Z" fill="',
-            colour,'"/>','</svg>'
-        ].join('');
-
     }
 
-    return str;
+    var x = radius + radius * Math.sin(percentage * 2 * Math.PI);
+    var y = radius - radius * Math.cos(percentage * 2 * Math.PI);
+
+    return [
+        '<svg width="',2*radius,'" height="',2*radius,'">',
+        '<circle cx="',radius,'" cy="',radius,'" r="',radius-0.5,'" stroke="',colour,
+        '" stroke-width="1" fill="transparent"/>','<path d="M ',radius,' ',radius,' L ',radius,
+        ' 0 A ',radius,' ',radius,' 0 '+(percentage>0.5?'1':'0')+' 1 '+x+' '+y+' Z" fill="',
+        colour,'"/>','</svg>'
+    ].join('');
 };

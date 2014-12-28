@@ -718,40 +718,35 @@ M.makeVariable = function($i, section) {
     return callback || null;
 };
 
-M.svg = {};
-
-M.svg.el = function(type, attributes, parent) {
-    var _this = this;
-    var svgns = 'http://www.w3.org/2000/svg';
-    this.$el = document.createElementNS(svgns, type);
-    this.data = {};
-    M.each(attributes, function(val, key){ _this.$el.setAttribute(key, val); });
-    if (parent) parent.append(this);
-};
-
-M.inherit(M.svg.el, M.$);
-
-M.svg.el.prototype.setPoints = function(p) {
-    this.attr('d', p.length ? 'M' + p.each(function(x){ return x.join(','); }).join('L') : '' );
+M.$.prototype.setPoints = function(p) {
+    this.attr('d', p.length ? 'M' + p.each(function(x){ return x.x + ',' + x.y; }).join('L') : '' );
     this.points = p;
 };
 
-M.svg.el.prototype.addPoint = function(p) {
-    this.attr('d', this.attr('d') + ' L '+p.join(',') );
+M.$.prototype.addPoint = function(p) {
+    this.getPoints();
+    this.attr('d', this.attr('d') + ' L ' + p.x + ',' + p.y);
     this.points.push(p);
 };
 
-M.svg.el.prototype.getPoints = function() {
-    var points = this.$el.attr('d').replace('M','').split('L');
-    return points.each(function(x){ return x.split(',').toNumbers(); });
+M.$.prototype.getPoints = function() {
+    if (!this.points) {
+        var points = this.$el.attr('d').replace('M','').split('L');
+        this.points = points.each(function(x){
+            p = x.split(',');
+            return new M.geo.Point(p[0], p[1]);
+        });
+    }
+    return this.points;
 };
 
+// =================================================================================================
+
 M.piechart = function(percentage, radius, colour) {
-    var str;
 
+    // Checkmark when completed
     if (percentage >= 1) {
-
-        str = [
+        return [
             '<svg width="',2*radius,'" height="',2*radius,'">',
             '<path fill="',colour,'" stroke="none" d="M',
             radius,',0C',radius*0.5,',0,0,',radius*0.5,',0,',radius,'s',
@@ -762,116 +757,116 @@ M.piechart = function(percentage, radius, colour) {
             radius*34.2/50,'-',radius*32.6/50,'l',radius*3.5/50,',',radius*3.5/50,'L',
             radius*44.6/50,',',radius*76.1/50,'z"/>','</svg>'
         ].join('');
-
-    } else {
-
-        var x = radius + radius * Math.sin(percentage * 2 * Math.PI);
-        var y = radius - radius * Math.cos(percentage * 2 * Math.PI);
-
-        str = [
-            '<svg width="',2*radius,'" height="',2*radius,'">',
-            '<circle cx="',radius,'" cy="',radius,'" r="',radius-0.5,'" stroke="',colour,
-            '" stroke-width="1" fill="transparent"/>','<path d="M ',radius,' ',radius,' L ',radius,
-            ' 0 A ',radius,' ',radius,' 0 '+(percentage>0.5?'1':'0')+' 1 '+x+' '+y+' Z" fill="',
-            colour,'"/>','</svg>'
-        ].join('');
-
     }
 
-    return str;
+    var x = radius + radius * Math.sin(percentage * 2 * Math.PI);
+    var y = radius - radius * Math.cos(percentage * 2 * Math.PI);
+
+    return [
+        '<svg width="',2*radius,'" height="',2*radius,'">',
+        '<circle cx="',radius,'" cy="',radius,'" r="',radius-0.5,'" stroke="',colour,
+        '" stroke-width="1" fill="transparent"/>','<path d="M ',radius,' ',radius,' L ',radius,
+        ' 0 A ',radius,' ',radius,' 0 '+(percentage>0.5?'1':'0')+' 1 '+x+' '+y+' Z" fill="',
+        colour,'"/>','</svg>'
+    ].join('');
 };
 
-M.Draw = function($svg, options) {
+M.Draw = M.Class.extend({
 
-    var _this = this;
+    init: function($svg, options) {
+        var _this = this;
 
-    $svg.addClass('m-draw-pointer');
-    _this.options = options;
-    _this.drawing = false;
-    _this.paths = [];
-    _this.p = null;
-    var activePath = null;
+        $svg.addClass('m-draw-pointer');
 
-    _this.start = function(p) {
-        if (_this.p && M.geo.distance(_this.p, p) < 20) {
-            activePath.addPoint(p);
+        this.$svg = $svg;
+        this.options = options = (options || {});
+        this.drawing = false;
+        this.paths = [];
+        this.p = null;
+        this.activePath = null;
 
-        } else {
-            if (options.onStart) options.onStart(p);
-            activePath = new M.svg.el('path', {
-                'class': 'm-draw-path',
-                'd': 'M '+p.join(',')
-            }, options.paths || $svg);
-            activePath.points = [p];
-            _this.paths.push(activePath);
+        if (!options.noStart) {
+            $svg.on('mousedown touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var p = M.events.pointerOffset(event, $svg);
+                _this.start(p);
+            });
         }
 
-        _this.drawing = true;
-        _this.p = p;
-    };
-
-    _this.addPoint = function(p) {
-        if (M.geo.manhatten(_this.p, p) > 4) {
-            activePath.addPoint(p);
-            _this.p = p;
-            if (options.onIntersect) _this.checkForIntersects();
-        }
-    };
-
-    if (!options.noStart) {
-        $svg.on('mousedown touchstart', function(e) {
-
+        $svg.on('mousemove touchmove', function(e) {
+            if (!_this.drawing) return;
             e.preventDefault();
             e.stopPropagation();
-
             var p = M.events.pointerOffset(event, $svg);
-            _this.start(p);
+            _this.addPoint(p);
         });
-    }
 
-    $svg.on('mousemove touchmove', function(e) {
-        if (!_this.drawing) return;
+        $svg.on('mouseup touchend mouseleave touchleave', function() {
+            _this.drawing = false;
+        });
+    },
 
-        e.preventDefault();
-        e.stopPropagation();
+    start: function(p) {
+        if (this.p && M.geo.distance(this.p, p) < 20) {
+            this.activePath.addPoint(p);
 
-        var p = M.events.pointerOffset(event, $svg);
-        _this.addPoint(p);
-    });
+        } else {
+            this.trigger('start');
+            this.activePath = $N('path', {
+                class: 'm-draw-path',
+                d: 'M ' + p.x + ',' + p.y
+            }, this.options.paths || this.$svg);
+            this.activePath.points = [p];
+            this.paths.push(this.activePath);
+        }
 
-    $svg.on('mouseup touchend mouseleave touchleave', function() {
-        _this.drawing = false;
-    });
-};
+        this.drawing = true;
+        this.p = p;
+    },
 
-M.Draw.prototype.checkForIntersects = function() {
+    addPoint: function(p) {
+        if (M.geo.distance(this.p, p) > 4) {
+            this.activePath.addPoint(p);
+            this.p = p;
+            this.checkForIntersects();
+        }
+    },
 
-    if (this.paths.length <= 1) return;
-    var path = this.paths.last();
-    var a1 = path.points[path.points.length-2];
-    var a2 = path.points[path.points.length-1];
+    stop: function() {
+        this.drawing = false;
+        this.p = null;
+    },
 
-    for (var i=0; i<this.paths.length-1; ++i) {
-        var l = this.paths[i].points.length;
-        for (var j=1; j<l-2; ++j) {
-            var t = M.geo.intersect(a1, a2, this.paths[i].points[j], this.paths[i].points[j+1]);
-            if (t) {
-                this.options.onIntersect(t, path, this.paths[i]);
-                return;
+    clear: function() {
+        this.paths.each(function(path) { path.remove(); });
+        this.paths = [];
+        this.trigger('clear');
+    },
+
+    checkForIntersects: function() {
+        if (!this.options.intersect || this.paths.length <= 1) return;
+        
+        var path1 = this.paths.last();
+        var points1 = path1.getPoints();
+        var line1 = new M.geo.Line(points1[points1.length-2], points1[points1.length-1]);
+
+        for (var i=0; i<this.paths.length-1; ++i) {
+            var path2 = this.paths[i];
+            var points2 = path2.getPoints();
+            for (var j=1; j<points2.length-2; ++j) {
+                var line2 = new M.geo.Line(points2[j], points2[j+1]);
+                console.log(line1.p1, line1.p2, line2.p1, line2.p2, M.geo.intersect(line1, line2));
+                var t = M.geo.intersect(line1, line2);
+                if (t) {
+                    this.trigger('intersect', { point: t, paths: [path1, path2] });
+                    return;
+                }
             }
         }
-    }
-};
+    },
 
-M.Draw.prototype.stop = function() {
-    this.drawing = false;
-    this.p = null;
-};
-
-M.Draw.prototype.clear = function() {
-    this.paths.each(function(path) { path.remove(); });
-    this.paths = [];
-};
+});
 
 
 })();

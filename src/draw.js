@@ -4,94 +4,98 @@
 // =================================================================================================
 
 
-M.Draw = function($svg, options) {
+M.Draw = M.Class.extend({
 
-    var _this = this;
+    init: function($svg, options) {
+        var _this = this;
 
-    $svg.addClass('m-draw-pointer');
-    _this.options = options;
-    _this.drawing = false;
-    _this.paths = [];
-    _this.p = null;
-    var activePath = null;
+        $svg.addClass('m-draw-pointer');
 
-    _this.start = function(p) {
-        if (_this.p && M.geo.distance(_this.p, p) < 20) {
-            activePath.addPoint(p);
+        this.$svg = $svg;
+        this.options = options = (options || {});
+        this.drawing = false;
+        this.paths = [];
+        this.p = null;
+        this.activePath = null;
 
-        } else {
-            if (options.onStart) options.onStart(p);
-            activePath = new M.svg.el('path', {
-                'class': 'm-draw-path',
-                'd': 'M '+p.join(',')
-            }, options.paths || $svg);
-            activePath.points = [p];
-            _this.paths.push(activePath);
+        if (!options.noStart) {
+            $svg.on('mousedown touchstart', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var p = M.events.pointerOffset(event, $svg);
+                _this.start(p);
+            });
         }
 
-        _this.drawing = true;
-        _this.p = p;
-    };
-
-    _this.addPoint = function(p) {
-        if (M.geo.manhatten(_this.p, p) > 4) {
-            activePath.addPoint(p);
-            _this.p = p;
-            if (options.onIntersect) _this.checkForIntersects();
-        }
-    };
-
-    if (!options.noStart) {
-        $svg.on('mousedown touchstart', function(e) {
-
+        $svg.on('mousemove touchmove', function(e) {
+            if (!_this.drawing) return;
             e.preventDefault();
             e.stopPropagation();
-
             var p = M.events.pointerOffset(event, $svg);
-            _this.start(p);
+            _this.addPoint(p);
         });
-    }
 
-    $svg.on('mousemove touchmove', function(e) {
-        if (!_this.drawing) return;
+        $svg.on('mouseup touchend mouseleave touchleave', function() {
+            _this.drawing = false;
+        });
+    },
 
-        e.preventDefault();
-        e.stopPropagation();
+    start: function(p) {
+        if (this.p && M.geo.distance(this.p, p) < 20) {
+            this.activePath.addPoint(p);
 
-        var p = M.events.pointerOffset(event, $svg);
-        _this.addPoint(p);
-    });
+        } else {
+            this.trigger('start');
+            this.activePath = $N('path', {
+                class: 'm-draw-path',
+                d: 'M ' + p.x + ',' + p.y
+            }, this.options.paths || this.$svg);
+            this.activePath.points = [p];
+            this.paths.push(this.activePath);
+        }
 
-    $svg.on('mouseup touchend mouseleave touchleave', function() {
-        _this.drawing = false;
-    });
-};
+        this.drawing = true;
+        this.p = p;
+    },
 
-M.Draw.prototype.checkForIntersects = function() {
+    addPoint: function(p) {
+        if (M.geo.distance(this.p, p) > 4) {
+            this.activePath.addPoint(p);
+            this.p = p;
+            this.checkForIntersects();
+        }
+    },
 
-    if (this.paths.length <= 1) return;
-    var path = this.paths.last();
-    var a1 = path.points[path.points.length-2];
-    var a2 = path.points[path.points.length-1];
+    stop: function() {
+        this.drawing = false;
+        this.p = null;
+    },
 
-    for (var i=0; i<this.paths.length-1; ++i) {
-        var l = this.paths[i].points.length;
-        for (var j=1; j<l-2; ++j) {
-            var t = M.geo.intersect(a1, a2, this.paths[i].points[j], this.paths[i].points[j+1]);
-            if (t) {
-                this.options.onIntersect(t, path, this.paths[i]);
-                return;
+    clear: function() {
+        this.paths.each(function(path) { path.remove(); });
+        this.paths = [];
+        this.trigger('clear');
+    },
+
+    checkForIntersects: function() {
+        if (!this.options.intersect || this.paths.length <= 1) return;
+        
+        var path1 = this.paths.last();
+        var points1 = path1.getPoints();
+        var line1 = new M.geo.Line(points1[points1.length-2], points1[points1.length-1]);
+
+        for (var i=0; i<this.paths.length-1; ++i) {
+            var path2 = this.paths[i];
+            var points2 = path2.getPoints();
+            for (var j=1; j<points2.length-2; ++j) {
+                var line2 = new M.geo.Line(points2[j], points2[j+1]);
+                var t = M.geo.intersect(line1, line2);
+                if (t) {
+                    this.trigger('intersect', { point: t, paths: [path1, path2] });
+                    return;
+                }
             }
         }
-    }
-};
+    },
 
-M.Draw.prototype.stop = function() {
-    this.drawing = false;
-    this.p = null;
-};
-
-M.Draw.prototype.clear = function() {
-    this.paths.each(function(path) { path.remove(); });
-    this.paths = [];
-};
+});
