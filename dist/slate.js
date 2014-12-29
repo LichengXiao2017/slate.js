@@ -856,7 +856,6 @@ M.Draw = M.Class.extend({
             var points2 = path2.getPoints();
             for (var j=1; j<points2.length-2; ++j) {
                 var line2 = new M.geo.Line(points2[j], points2[j+1]);
-                console.log(line1.p1, line1.p2, line2.p1, line2.p2, M.geo.intersect(line1, line2));
                 var t = M.geo.intersect(line1, line2);
                 if (t) {
                     this.trigger('intersect', { point: t, paths: [path1, path2] });
