@@ -81,10 +81,10 @@ M.Graph = M.Class.extend({
     load: function(vertices, edges, posn) {
         var _this = this;
 
-        this.repulsion  = 80 / vertices * (this.width + this.height) / 240;
-        this.attraction = 1 / M.square(edges.length) * 2 * 120 / (this.width + this.height);
+        this.repulsion  = 50 / Math.sqrt(vertices);
+        this.attraction = 0.1 * Math.sqrt(vertices) / edges.length * 200 /(this.width + this.height);
+        this.gravity    = vertices/4;
         this.damping    = 0.9;
-        this.gravity    = 0.8;
 
         this.$vertices.clear();
         this.$edges.clear();
@@ -100,7 +100,6 @@ M.Graph = M.Class.extend({
         });
 
         this.edges = edges.each(function(e) {
-            // TODO to self + multi edge
             var v1 = _this.vertices[e[0]];
             var v2 = _this.vertices[e[1]];
 
