@@ -212,7 +212,7 @@ M.Graph = M.Class.extend({
             if (e.vertices[0] === e.vertices[1]) {
                 if (!center) center = M.geo.average(_this.vertices.each(function(v) { return v.posn; }));
 
-                var v = M.Vector([e.vertices[0].posn.x - center.x, e.vertices[0].posn.y - center.y]).normalize();
+                var v = M.Vector([e.vertices[0].posn.x - center.x, e.vertices[0].posn.y - center.y]).normalise();
                 var v0 = M.vector.mult([v[0] + v[1], v[1] - v[0]], 40);
                 var v1 = M.vector.mult([v[0] - v[1], v[1] + v[0]], 40);
 

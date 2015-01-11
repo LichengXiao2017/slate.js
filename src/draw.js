@@ -36,6 +36,7 @@ M.Draw = M.Class.extend({
         });
 
         $svg.on('mouseup touchend mouseleave touchleave', function() {
+            _this.trigger('end');
             _this.drawing = false;
         });
     },
