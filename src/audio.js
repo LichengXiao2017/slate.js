@@ -25,7 +25,7 @@ M.audio.Chunk = M.Class.extend({
         this.currentTime = times[0];
         this.duration = times[1] - times[0];
         this.player = M.audio.files[file] || M.audio.load(file, Math.floor(Math.random()*10000));
-        this.ended = false;
+        this.status = 'paused';
     },
 
     play: function() {
@@ -39,13 +39,14 @@ M.audio.Chunk = M.Class.extend({
         if (M.audio.playing) M.audio.playing.pause();
         M.audio.playing = this;
 
-        this.ended = false;
+        this.status = 'playing';
         this.player.currentTime = this.currentTime;
         this.player.play();
         this.trigger('play', { p: (this.currentTime - this.times[0]) / this.duration, t: this.currentTime });
     },
 
     pause: function() {
+        this.status = 'paused';
         if (M.audio.playing === this) this.player.pause();
         this.trigger('pause');
     },
@@ -58,19 +59,19 @@ M.audio.Chunk = M.Class.extend({
     reset: function() {
         if (M.audio.playing === this) this.player.pause();
         if (this.player.readyState) this.currentTime = this.times[0];
-        this.ended = true;
+        this.status = 'paused';
         this.trigger('reset');
     },
 
     update: function() {
-        if (this.ended) return;
+        if (this.status === 'ended') return;
 
         if (M.audio.playing === this)
             this.currentTime = this.player.currentTime;
 
         if (this.currentTime >= this.times[1]) {
-            this.ended = true;
             this.pause();
+            this.status = 'ended';
             this.trigger('end');
             return;
         }
