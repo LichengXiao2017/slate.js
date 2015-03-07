@@ -1,5 +1,5 @@
 // Boost Browser and DOM Tools
-// (c) 2014, Mathigon / Philipp Legner
+// (c) 2015, Mathigon / Philipp Legner
 // MIT License (https://github.com/Mathigon/slate.js/blob/master/LICENSE)
 
  (function() {
@@ -382,10 +382,12 @@ M.Frame = M.Class.extend({
         $el.wrap($wrap);
 
         function resize() {
-            var w = $wrap.width('border');
-            var h = w * ratio;
-            $wrap.css('height', h+'px');
-            $el.transform('scale(' + w/width + ') translateZ(0)');
+            setTimeout(function() {
+                var w = $wrap.width('border');
+                var h = w * ratio;
+                $wrap.css('height', h+'px');
+                $el.transform('scale(' + w/width + ') translateZ(0)');
+            });
         }
 
         M.resize(resize);
