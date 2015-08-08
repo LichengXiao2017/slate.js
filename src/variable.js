@@ -1,19 +1,44 @@
-// =================================================================================================
+// =============================================================================
 // Slate.js | Variables
-// (c) 2015 Mathigon / Philipp Legner
-// =================================================================================================
-
-/*jshint evil: true */
+// (c) 2015 Mathigon
+// =============================================================================
 
 
-M.Variable = M.Class.extend({
 
-    init: function($i, section) {
+import { create } from 'customelements';
+
+
+let XVariable = create('x-var', {
+
+    template: '<div></div>',
+
+    created: function() {
+        // TODO
+    },
+
+    attached: function() {
+        // TODO
+    },
+
+    detached: function() {
+        // TODO
+    }
+
+});
+
+
+
+
+export default class Variable extends Evented {
+
+    constructor($i, section) {
         var _this = this;
 
         var values = section.varValues;
         var $el = $i;
-        var fn = new Function('_vars', 'with(_vars){ return ' + $i.html() + '; }');
+
+        /*jshint evil: true */
+        var fn = new Function('_vars', 'with(_vars){ return ' + $i.text() + '; }');
 
         this.on('change', function() {
             try { $el.html(fn(values)); } catch (e) { console.debug(fn, e); }
@@ -25,7 +50,7 @@ M.Variable = M.Class.extend({
 
         if (!$i.attr('data-var')) return;
 
-        // ----------------------------------------------------------------------------------------
+        // ---------------------------------------------------------------------
 
         $i.addClass('var');
         var t = $i.attr('data-var').split('|');
@@ -112,8 +137,7 @@ M.Variable = M.Class.extend({
 
         }
     }
-
-});
+};
 
 
 

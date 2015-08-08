@@ -52,7 +52,7 @@ M.scrollReveal = function($els) {
             $el.transform('translate' + axis + '(' + direction + distance + ')');
         }
 
-        $el.transition(['opacity', duration, delay, ',', M.prefix('transform'), duration, delay].join(' '));
+        $el.transition(['opacity', duration, delay, ',', M.prefix('transform', true), duration, delay].join(' '));
 
         return function() {
             if (!isShown && isInViewport($el, factor)) show();

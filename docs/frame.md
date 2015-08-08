@@ -1,3 +1,0 @@
-## Resize Frames
-
-### Frame

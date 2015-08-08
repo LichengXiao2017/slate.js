@@ -1,7 +1,0 @@
-## Slider
-
-### Draggable
-
-### Slider
-
-### imageSequence

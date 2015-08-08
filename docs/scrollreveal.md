@@ -1,3 +1,0 @@
-## Scroll Reveal
-
-### scrollReveal

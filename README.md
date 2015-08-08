@@ -1,6 +1,6 @@
-# Slate.js
+# slate.js
 
-Collection of useful UI and media classes: audio and speech recognition, draggable, slider and gallery, SVG library, interactive variables and more.
+TODO
 
 
 ## Quick start
@@ -20,4 +20,4 @@ TODO
 
 ## Copyright and license
 
-Code and documentation are copyright (c) 2014 Mathigon. Code is released under the [MIT license](LICENSE).
+Code and documentation are copyright (c) 2015 Mathigon. Released under the [MIT license](LICENSE).
