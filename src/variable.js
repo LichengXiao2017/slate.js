@@ -5,12 +5,10 @@
 
 
 
-import { create } from 'customelements';
+import { $, customElement, $body } from 'elements';
 
 
-let XVariable = create('x-var', {
-
-    template: '<div></div>',
+export default customElement('x-var', {
 
     created: function() {
         // TODO
@@ -22,6 +20,10 @@ let XVariable = create('x-var', {
 
     detached: function() {
         // TODO
+    },
+
+    attributes: {
+
     }
 
 });
@@ -29,15 +31,14 @@ let XVariable = create('x-var', {
 
 
 
-export default class Variable extends Evented {
-
+/*
     constructor($i, section) {
         var _this = this;
 
         var values = section.varValues;
         var $el = $i;
 
-        /*jshint evil: true */
+        // jshint evil: true
         var fn = new Function('_vars', 'with(_vars){ return ' + $i.text() + '; }');
 
         this.on('change', function() {
@@ -137,8 +138,7 @@ export default class Variable extends Evented {
 
         }
     }
-};
-
+*/
 
 
 

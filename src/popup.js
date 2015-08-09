@@ -4,9 +4,37 @@
 // =================================================================================================
 
 
-M.Popup = function($popup, chapter) {
 
-    // TODO onopen(), onclose() functions
+import { $, customElement } from 'elements';
+
+
+export default customElement('x-var', {
+
+    created: function($el, $shadow) {
+        // TODO
+    },
+
+    attached: function() {
+        // TODO
+    },
+
+    detached: function() {
+        // TODO
+    },
+
+    attributes: {
+
+    },
+
+    template: ''
+
+});
+
+
+
+
+/*
+M.Popup = function($popup, chapter) {
 
     var _this = this;
 
@@ -65,3 +93,4 @@ M.Popup = function($popup, chapter) {
     $bubble.click(function(e){ e.stopPropagation(); });
     $popup.click(click);
 };
+*/
