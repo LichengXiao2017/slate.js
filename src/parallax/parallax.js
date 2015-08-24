@@ -12,8 +12,9 @@ import Browser from 'browser';
 export default customElement('x-parallax', {
 
     created: function($el, $shadow) {
-        this.$bg   = $shadow.children(1);
-        this.$blur = $shadow.children(2);
+        // TODO allow animation of multiple properties
+        this.$bg   = $shadow.find('.parallax-img');
+        this.$blur = $shadow.find('.parallax-shadow');
     },
 
     attached: function($el, $shadow) {
@@ -39,7 +40,6 @@ export default customElement('x-parallax', {
 
         Browser.resize(resize);
         $body.on('scroll', scroll);
-        resize();
     },
 
     detached: function($el, $shadow) {
@@ -52,6 +52,7 @@ export default customElement('x-parallax', {
         }
     },
 
-    template: require('./parallax.jade')
+    template: require('./parallax.jade'),
+    styles: require('./parallax.less')
 
 });

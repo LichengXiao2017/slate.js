@@ -7,8 +7,9 @@
 
 import { $, customElement } from 'elements';
 
+let activePopup;
 
-export default customElement('x-var', {
+export default customElement('x-popup', {
 
     created: function($el, $shadow) {
         // TODO
@@ -22,11 +23,7 @@ export default customElement('x-var', {
         // TODO
     },
 
-    attributes: {
-
-    },
-
-    template: ''
+    template: '<popup-pubble>'
 
 });
 

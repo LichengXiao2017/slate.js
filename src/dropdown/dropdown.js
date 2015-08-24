@@ -1,59 +1,66 @@
+// =============================================================================
+// Slate.js | Dropdown
+// (c) 2015 Mathigon
+// =============================================================================
 
-let XDropdownProto = Object.create(HTMLElement.prototype);
 
-XDropdownProto.createdCallback = function() {
-	this.createShadowRoot().innerHTML = require('./dropdown.jade')();
 
-    var _this = this;
+import { $, customElement, $body } from 'elements';
+import Browser from 'browser';
 
-    window.x = this.shadowRoot;
-    this._title = this.shadowRoot.children[1].children[0];
-    this._body = this.shadowRoot.children[1].children[1];
-    this._isOpen = false;
 
-    this._title.addEventListener('click', function(e) {
-        _this.toggle();
-        e.stopPropagation();
-    });
+export default customElement('x-dropdown', {
 
-    this._body.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-};
+    created: function($el, $shadow) {
+        let _this = this;
 
-XDropdownProto.attachedCallback = function() {
-    var _this = this;
+        this.$title = $shadow.find('.dropdown-title');
+        this.$body = $shadow.find('.dropdown-body');
+        this.isOpen = false;
 
-    document.body.addEventListener('click', function(e) {
-        _this.hide();
-    });
-};
+        this.$title.on('click', function(e) {
+            _this.toggle();
+            e.stopPropagation();
+        });
 
-XDropdownProto.detachedCallback = function() {
-	// TODO remove body event listener
-};
+        this.$body.on('click', function(e) {
+            e.stopPropagation();
+        });
+    },
 
-XDropdownProto.show = function() {
-    if (this._isOpen) return;
-    this.classList.add('open');
-    this._body.style.display = 'block';
-    this._isOpen = true;
-};
+    attached: function($el, $shadow) {
+        var _this = this;
+        $body.on('click', function(e) {
+            _this.hide();
+        });
+    },
 
-XDropdownProto.hide = function() {
-    if (!this._isOpen) return;
-    this.classList.remove('open');
-    this._body.style.display = 'none';
-    this._isOpen = false;
-};
+    detached: function($el, $shadow) {
+        // TODO remove body event listener
+    },
 
-XDropdownProto.toggle = function() {
-    if (this._isOpen) {
-        this.hide();
-    } else {
-        this.show();
-    }
-};
+    show: function() {
+        // TODO animate show
+        if (this.isOpen) return;
+        this.$body.show();
+        this.isOpen = true;
+    },
 
-let XDropdown = document.registerElement('x-dropdown', { prototype: XDropdownProto });
-export default XDropdown;
+    hide: function() {
+        // TODO animate hide
+        if (!this.isOpen) return;
+        this.$body.hide();
+        this.isOpen = false;
+    },
+
+    toggle: function() {
+        if (this.isOpen) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    },
+
+    template: require('./dropdown.jade')
+
+});

@@ -1,0 +1,30 @@
+:host {
+    display: block;
+    overflow: hidden;
+    position: relative;
+}
+
+.parallax-img, .parallax-shadow {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+  
+.parallax-img {
+    background-size: cover;
+    background-position: center;
+    will-change: transform;
+}
+
+.parallax-shadow {
+    background: #000;
+    opacity: 0;
+    will-change: opacity;
+}
+  
+.parallax-content {
+    height: 100%;
+    position: relative;
+}
