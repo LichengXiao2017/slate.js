@@ -1,14 +1,30 @@
-// =================================================================================================
-// Slate.js | Graph
-// (c) 2015 Mathigon / Philipp Legner
-// =================================================================================================
+// =============================================================================
+// Mathigon.org | Graph Class
+// (c) 2015 Mathigon
+// =============================================================================
 
 
-M.Graph = M.Class.extend({
+import { $, $$, $T, $C, $N, $body } from 'elements';
+import { pointerOffset } from 'dom-events';
+import { nearlyEquals } from 'arithmetic';
+import { square, run, clamp } from 'utilities';
+import { Point } from 'geometry';
+import { animationFrame } from 'animate';
+import { list } from 'arrays';
+import Vector from 'vector';
+import Browser from 'browser';
+import Evented from 'evented';
 
-    init: function($svg, vertices, edges, options) {
-        var _this = this;
-        this.options = options = options || {};
+
+function V(...args) { return new Vector(...args); }
+
+export default class Graph extends Evented {
+
+    constructor($svg, vertices, edges, options = {}) {
+    	super();
+        let _this = this;
+        
+        this.options = options;
 
         this.$edges = $N('g', {}, $svg);
         this.$vertices = $N('g', {}, $svg);
@@ -16,19 +32,15 @@ M.Graph = M.Class.extend({
         this.vertices = [];
         this.edges = [];
 
-        var resize = function() {
-            _this.width = $svg.width();
-            _this.height = $svg.height();
-        };
-        M.resize(resize);
-        resize();
-
         this.stable = false;
         this.dragging = null;
 
-        if (this.options.directed) {
-            var $defs = $N('defs', {}, $svg);
-            var $marker = $N('marker', {
+        this.width = $svg.width;
+        this.height = $svg.height;
+
+        if (options.directed) {
+            let $defs = $N('defs', {}, $svg);
+            let $marker = $N('marker', {
                 id: 'arrow-head',
                 viewBox: '0 -5 10 10',
                 refX: '14',
@@ -41,11 +53,11 @@ M.Graph = M.Class.extend({
         }
 
         function onStart(e) {
-            var u = M.events.pointerOffset(e, $svg);
+            let u = pointerOffset(e, $svg);
 
-            for (var i=0; i<_this.vertices.length; ++i) {
-                var v = _this.vertices[i];
-                if (M.geo.distance(u, v.posn) < 18) {
+            for (let i=0; i<_this.vertices.length; ++i) {
+                let v = _this.vertices[i];
+                if (Point.distance(u, v.posn) < 18) {
                     _this.dragging = v;
                     _this.dragging.posn = u;
                     _this.stable = false;
@@ -54,31 +66,30 @@ M.Graph = M.Class.extend({
                 }
             }
 
-            M.$body.on('mousemove touchmove', onMove);
-            M.$body.on('mouseup touchend touchcancel mouseleave', onEnd);
+            $body.on('pointerMove', onMove);
+            $body.on('pointerEnd', onEnd);
         }
 
         function onMove(e) {
             e.preventDefault();
             e.stopPropagation();
             if (!_this.dragging) return;
-            _this.dragging.posn = M.events.pointerOffset(e, $svg);
+            _this.dragging.posn = pointerOffset(e, $svg);
             _this.redraw();
             _this.stable = false;
         }
 
         function onEnd(e) {
             _this.dragging = null;
-            M.$body.off('mousemove touchmove', onMove);
-            M.$body.off('mouseup touchend touchcancel mouseleave', onEnd);
+            $body.off('pointerMove', onMove);
+            $body.off('pointerEnd', onEnd);
         }
 
-        $svg.on('mousedown touchstart', onStart);
-
+        $svg.on('pointerStart', onStart);
         this.load(vertices, edges, options.posn);
-    },
+    }
 
-    load: function(vertices, edges, posn) {
+    load(vertices, edges, posn) {
         var _this = this;
 
         this.repulsion  = 50 / Math.sqrt(vertices);
@@ -89,24 +100,24 @@ M.Graph = M.Class.extend({
         this.$vertices.clear();
         this.$edges.clear();
 
-        this.vertices = M.list(vertices).each(function(v) {
-            var x = posn ? (posn[v][0] || posn[v].x) : _this.width * (0.3 + 0.4 * Math.random());
-            var y = posn ? (posn[v][1] || posn[v].y) : _this.height* (0.3 + 0.4 * Math.random());
+        this.vertices = list(vertices).map(function(v) {
+            var x = posn ? (posn[v][0] || posn[v].x) : _this.width  * (0.3 + 0.4 * Math.random());
+            var y = posn ? (posn[v][1] || posn[v].y) : _this.height * (0.3 + 0.4 * Math.random());
 
             var $el = _this.options.icon ? $N('path', { 'class': 'node', d: _this.options.icon, }, _this.$vertices) :
                           $N('circle', { 'class': 'node', r: _this.options.r || 5 }, _this.$vertices);
-            if (_this.options.vertex) $el.css('fill', M.run(_this.options.vertex, [v]));
+            if (_this.options.vertex) $el.css('fill', run(_this.options.vertex, [v]));
             return { $el: $el, posn: { x: x, y: y }, neighbours: [], v: { x: 0, y: 0 } };
         });
 
-        this.edges = edges.each(function(e) {
+        this.edges = edges.map(function(e) {
             var v1 = _this.vertices[e[0]];
             var v2 = _this.vertices[e[1]];
 
             var type = (v1 === v2) || _this.options.arc ? 'path' : 'line';
             var $el = $N(type, { 'class': 'link' }, _this.$edges);
             if (_this.options.directed) $el.attr('marker-end', 'url(#arrow-head)');
-            if (_this.options.edge) $el.css('stroke', M.run(_this.options.edge, [e[0], e[1]]));
+            if (_this.options.edge) $el.css('stroke', run(_this.options.edge, [e[0], e[1]]));
 
             var edge = { $el: $el, vertices: [v1, v2] };
 
@@ -116,9 +127,9 @@ M.Graph = M.Class.extend({
         });
 
         this.redraw();
-    },
+    }
 
-    redraw: function() {
+    redraw() {
         var _this = this;
 
         if (this.options.static) {
@@ -135,35 +146,35 @@ M.Graph = M.Class.extend({
             if(_this.stable) {
                 _this.animating = false;
             } else {
-                M.animationFrame(tick);
+                animationFrame(tick);
                 _this.physics();
             }
         }
         tick();
-    },
+    }
 
-    physics: function() {
+    physics() {
         var _this = this;
 
         var positions = [];
         var totalMoved = 0;
 
-        this.vertices.each(function(v, i) {
+        this.vertices.forEach(function(v, i) {
             if (_this.options.static || v === _this.dragging) return;
             var force = { x: 0, y: 0 };
 
-            _this.vertices.each(function(u) {
+            _this.vertices.forEach(function(u) {
                 if (u === v) return;
 
                 // Coulomb's Repulsion between Vertices
-                var d = M.square(v.posn.x - u.posn.x) + M.square(v.posn.y - u.posn.y);
-                if (M.nearlyEquals(d, 0, 0.001)) d = 0.001;
+                var d = square(v.posn.x - u.posn.x) + square(v.posn.y - u.posn.y);
+                if (nearlyEquals(d, 0, 0.001)) d = 0.001;
                 var coul = _this.repulsion / d;
                 force.x += coul * (v.posn.x - u.posn.x);
                 force.y += coul * (v.posn.y - u.posn.y);
             });
 
-            v.neighbours.each(function(u) {
+            v.neighbours.forEach(function(u) {
                 // Hook's attraction between Neighbours
                 force.x += _this.attraction * (u.posn.x - v.posn.x);
                 force.y += _this.attraction * (u.posn.y - v.posn.y);
@@ -181,21 +192,21 @@ M.Graph = M.Class.extend({
 
         this.stable = (totalMoved < 0.5 && !this.dragging);
         this.arrange(positions);
-    },
+    }
 
-    arrange: function(positions) {
+    arrange(positions) {
 
         var _this = this;
         if (!positions) positions = [];
         var center = null;
 
-        this.vertices.each(function(v, i) {
+        this.vertices.forEach(function(v, i) {
             v.posn = positions[i] || v.posn;
 
             if (_this.options.bound) {
                 var distance = _this.options.r || 5;
-                v.posn.x = M.bound(v.posn.x, distance, _this.width  - distance);
-                v.posn.y = M.bound(v.posn.y, distance, _this.height - distance);
+                v.posn.x = clamp(v.posn.x, distance, _this.width  - distance);
+                v.posn.y = clamp(v.posn.y, distance, _this.height - distance);
             }
 
             if (_this.options.icon) {
@@ -206,15 +217,15 @@ M.Graph = M.Class.extend({
             }
         });
 
-        this.edges.each(function(e) {
+        this.edges.forEach(function(e) {
 
             // connected to self
             if (e.vertices[0] === e.vertices[1]) {
-                if (!center) center = M.geo.average(_this.vertices.each(function(v) { return v.posn; }));
+                if (!center) center = Point.average(..._this.vertices.map(v => v.posn));
 
-                var v = M.Vector([e.vertices[0].posn.x - center.x, e.vertices[0].posn.y - center.y]).normalise();
-                var v0 = M.vector.mult([v[0] + v[1], v[1] - v[0]], 40);
-                var v1 = M.vector.mult([v[0] - v[1], v[1] + v[0]], 40);
+                var v = V(e.vertices[0].posn.x - center.x, e.vertices[0].posn.y - center.y).normalise();
+                var v0 = V(v[0] + v[1], v[1] - v[0]).scaled(40);
+                var v1 = V(v[0] - v[1], v[1] + v[0]).scaled(40);
 
                 e.$el.attr('d', 'M'+e.vertices[0].posn.x+','+e.vertices[0].posn.y+
                     'c'+v0[0]+','+v0[1]+','+v1[0]+','+v1[1]+',0,0');
@@ -238,4 +249,5 @@ M.Graph = M.Class.extend({
 
         this.trigger('update');
     }
-});
+
+}

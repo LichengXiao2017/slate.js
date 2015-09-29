@@ -14,6 +14,7 @@
     right: 0;
     background: fade(#000, 0%);
     z-index: 800;
+    will-change: background;
     transition: background .4s;
 }
 
@@ -28,6 +29,7 @@
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    will-change: transition;
     &.transitions { transition: transform .4s ease-in-out; }
 }
 

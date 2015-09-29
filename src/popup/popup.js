@@ -1,93 +1,85 @@
-// =================================================================================================
-// Slate.js | Popup Bubbles
-// (c) 2015 Mathigon / Philipp Legner
-// =================================================================================================
+// =============================================================================
+// Slate.js | Popups
+// (c) 2015 Mathigon
+// =============================================================================
 
 
 
-import { $, customElement } from 'elements';
+import { $, $body, customElement } from 'elements';
+import Browser from 'browser';
+
+
+const MARGIN = 15;
 
 let activePopup;
+let $container;
+export function setContainer(el) { $container = el; }
+
 
 export default customElement('x-popup', {
 
     created: function($el, $shadow) {
-        // TODO
-    },
+        
+        let _this = this;
+        let $popup = $shadow.find('.popup');
+        let $box = $shadow.find('.popup-box');
+        let $bubble = $shadow.find('.popup-body');
+        let $target = $shadow.find('.target');
 
-    attached: function() {
-        // TODO
+        this.open = function() {
+            if (activePopup) activePopup.close();
+            $box.show();
+
+            // In off state, $bubble is scaled to 0.5 of the size.
+            // We have to body the top offset:
+            let bounds = $bubble.bounds;
+            let top = bounds.top - bounds.height;
+            let left = bounds.left - bounds.width/2;
+            let right = bounds.right + bounds.width/2;
+
+            let pageLeft = $container ? $container.offsetLeft : 0;
+            let pageRight = $container ? $container.offsetRight : $body.width;
+
+            if (left < pageLeft + MARGIN)
+                $bubble.translateX(pageLeft + MARGIN - left);
+
+            if (right > pageRight - MARGIN)
+                $bubble.translateX(pageRight - MARGIN - right);
+
+            Browser.redraw();
+            if (top < MARGIN ) { $body.scrollBy(top - MARGIN); }
+
+            $popup.addClass('on');
+            activePopup = _this;
+        };
+
+        this.close = function() {
+            $popup.removeClass('on');
+            activePopup = null;
+            setTimeout( function(){ $box.hide(); }, 200);
+        };
+
+
+        function click(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            if ($popup.hasClass('on')) {
+                _this.close();
+            } else {
+                _this.open();
+            }
+        }
+
+        this.clear = function() { $popup.off('click', click); };
+        $bubble.on('click', function(e){ e.stopPropagation(); });
+        $popup.on('click', click);
     },
 
     detached: function() {
-        // TODO
+        this.close();
     },
 
-    template: '<popup-pubble>'
-
+    styles: require('./popup.less'),
+    template: require('./popup.jade')
 });
-
-
-
-
-/*
-M.Popup = function($popup, chapter) {
-
-    var _this = this;
-
-    var $bubble = $C('popup-bubble',$popup);
-    if (!$bubble) return;
-
-    var $bubbleBox = $C('bubble-box',$bubble);
-    $N('span', {'class': 'bubble-arrow'}, $bubble);
-
-    _this.open = function() {
-
-        if (chapter.activePopup) chapter.activePopup.close();
-        $bubble.css('display', 'block');
-
-        // In off state, $bubble is scaled to 0.5 of the size. We have to adjust the top offset:
-        var bounds = $bubble.$el.getBoundingClientRect();
-        var top = bounds.top - bounds.height;
-        var left = bounds.left - bounds.width/2;
-        var right = bounds.right + bounds.width/2;
-
-        var pageLeft = chapter.$container.offset().left;
-        var pageRight = M.browser.width;
-
-        if (left < pageLeft + 10)
-            $bubbleBox.translateX(pageLeft + 10 - left);
-
-        if (right > pageRight - 54)
-            $bubbleBox.translateX(pageRight - 54 - right);
-
-        M.redraw();
-        if (top < 27 ) { chapter.scrollBy(top - 27); }
-
-        $popup.addClass('on');
-        chapter.activePopup = _this;
-    };
-
-    _this.close = function() {
-        $popup.removeClass('on');
-        chapter.activePopup = null;
-        setTimeout( function(){ $bubble.css('display', 'none'); }, 200);
-    };
-
-    _this.delete = function() { $popup.off('click', click); };
-
-    var click = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if ($popup.hasClass('on')) {
-            _this.close();
-        } else {
-            _this.open();
-        }
-    };
-
-    $bubble.click(function(e){ e.stopPropagation(); });
-    $popup.click(click);
-};
-*/

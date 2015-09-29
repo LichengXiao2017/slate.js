@@ -23,14 +23,14 @@ export default customElement('x-parallax', {
 
         this.$bg.css('background-image', 'url("' + this.getAttribute('background') + '")');
 
-        function resize() {
-            start = Math.max(0, $el.offsetTop - window.innerHeight);
-            end = $el.offsetTop + _this.offsetHeight;
-            scroll({ top: $body.scrollTop });
+        function resize([{ height }]) {
+            let top = $el.positionTop;
+            start = Math.max(0, top - height);
+            end = top + $el.height;
         }
 
         function scroll(e) {
-            if (e.top >= start && e.top <= end) { // check for window size
+            if (e.top >= start && e.top <= end) {
                 let scale = (e.top - start) / (end - start);
                 let prop = Math.pow(1.5, scale);
                 _this.$bg.transform = 'scale(' + Math.max(1, prop) + ')';

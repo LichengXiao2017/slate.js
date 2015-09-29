@@ -1,17 +1,23 @@
+// =============================================================================
+// Slate.js | Popup Styles
+// (c) 2015 Mathigon
+// =============================================================================
+
+
 
 .popup {
+    display: inline-block;
     position: relative;
 }
 
-.popup-bubble {
+.popup-box {
     width: 140px;
     position: absolute;
-    bottom: 24px;
+    bottom: 25px;
     left: 50%;
     margin-left: -70px;
-    padding-bottom: 6px;
+    padding-bottom: 8px;
     display: none;
-    cursor: default;
     z-index: 500;
 
     opacity: 0;
@@ -20,10 +26,10 @@
     transition: transform .25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .25s;
 }
 
-.popup.on .popup-bubble { opacity: 1; transform: none; }
+.on .popup-box { opacity: 1; transform: none; }
 
-.bubble-box {
-    background: @red;
+.popup-body {
+    background: #666;
     border-radius: 6px;
     box-shadow : 0px 1px 3px rgba(0, 0, 0, 0.3);
     display: block;
@@ -32,30 +38,31 @@
     line-height: 1.2;
 }
 
-.bubble-arrow {
-    width: 0;
-    height: 0;
+.popup-arrow {
     position: absolute;
     bottom: 0;
     left: 50%;
-    margin-left: -6px;
+    margin-left: -8px;
     display: block;
 
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 6px solid @red;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #666;
 }
 
-.bubble-item {
+::content .popup-target {
+    cursor: pointer;
+}
+
+::content .popup-item {
     padding: 8px 12px 0px 12px;
     cursor: pointer;
     display: block;
+    &:hover { color: #FFF; }
 }
 
-.bubble-item:hover         { color: #FFF; }
-.bubble-item:hover .rArrow { opacity: 1; }
 
-.bubble-item:after {
+::content .popup-item:after {
     content: "";
     display: block;
     height: 1px;
@@ -63,21 +70,8 @@
     background: rgba(255,255,255,0.5);
 }
 
-.bubble-button-item:after {
-    content: "";
-    display: block;
-    height: 1px;
-    margin: 0 12px 0;
-    background: rgba(255,255,255,0.5);
-}
-
-.bubble-item:last-child:after, .bubble-button-item:last-child:after, .bubble-button-item .bubble-item:after {
-    height: 7px;
+::content .popup-item:last-child:after {
+    height: 9px;
     margin: 0;
     background: transparent;
-}
-
-.bubble-item-note {
-    color: rgba(255,255,255,0.3);
-    font-size: 80%;
 }
