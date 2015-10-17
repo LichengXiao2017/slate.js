@@ -11,19 +11,19 @@ import Browser from 'browser';
 
 export default customElement('x-parallax', {
 
-    created: function($el, $shadow) {
+    created: function($el) {
         // TODO allow animation of multiple properties
-        this.$bg   = $shadow.find('.parallax-img');
-        this.$blur = $shadow.find('.parallax-shadow');
+        this.$bg   = $el.find('.image');
+        this.$blur = $el.find('.shadow');
     },
 
-    attached: function($el, $shadow) {
+    attached: function($el) {
         let _this = this;
         let start, end;
 
         this.$bg.css('background-image', 'url("' + this.getAttribute('background') + '")');
 
-        function resize([{ height }]) {
+        function resize({ height }) {
             let top = $el.positionTop;
             start = Math.max(0, top - height);
             end = top + $el.height;
@@ -42,7 +42,7 @@ export default customElement('x-parallax', {
         $body.on('scroll', scroll);
     },
 
-    detached: function($el, $shadow) {
+    detached: function($el) {
         // TODO remove body event listener
     },
 

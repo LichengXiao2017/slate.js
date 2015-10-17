@@ -28,13 +28,11 @@ const $targets = $N('svg', {
 const $mask = $targets.find('mask');
 
 
-
 export default customElement('x-target', {
 
-    created: function($el, $shadow) {
-        
+    created: function($el) {
+
         let $bounds;
-        let $arrow = $shadow.find('.arrow');
         let query = 'body /deep/ ' + $el.attr('to');
 
         $el.on('mouseenter touchstart', function() {
@@ -66,11 +64,13 @@ export default customElement('x-target', {
             Browser.redraw();
             $targets.enter(300, 'fade', scroll ? 300 : 0);
 
-            /* var targetBounds = $el.offset();
+            /* TODO target arrows
+            var targetBounds = $el.offset();
             var dx = bounds[0].geo.left + bounds[0].geo.width/2  - targetBounds.left - 17;
             var dy = bounds[0].geo.top  + bounds[0].geo.height/2 - targetBounds.top  - 17 - scroll;
             var angle = 45 + Math.atan2(dy, dx) * 180 / Math.PI;
-            $el.transform('rotate(' + Math.round(angle) + 'deg)');*/
+            $arrow.transform('rotate(' + Math.round(angle) + 'deg)');
+            */
         });
 
         $el.on('mouseleave touchend', function() {
@@ -79,13 +79,10 @@ export default customElement('x-target', {
 
             $el.transform = 'none';
             $targets.fadeOut(300);
-            setTimeout(function() { 
+            setTimeout(function() {
                 $oldBounds.forEach(function($b) { $b.remove(); });
             }, 300);
         });
 
-    },
-
-    template: '<div class="target"><content></content><div class="arrow"></div></div>',
-    styles: require('./target.less')
+    }
 });

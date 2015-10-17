@@ -1,60 +1,69 @@
-:host {
+x-gallery {
     display: block;
     position: relative;
     padding-bottom: 31px;
-}
 
-::content > div {  // slides
-    padding: .5em;
-    float: left;
-    box-sizing: border-box;
-    & img { width: 100%; height: auto; display: block; }
-}
+    .wrapper {
+        overflow: hidden;
+        cursor: ew-resize;
+        border-bottom: 1px solid #AAA;
+    }
 
-.wrapper {
-    overflow: hidden;
-    cursor: ew-resize;
-    border-bottom: 1px solid #AAA;
-}
+    .panel {
+        transform: translateX(0);
+        &:after {
+            content: " ";
+            clear: both;
+            display: block;
+        }
+    }
 
-.panel {
-    transform: translateX(0);
-    &:after { content: " "; clear: both; display: block; }
-}
+    .panel > * {
+        // slides
+        padding: .5em;
+        float: left;
+        box-sizing: border-box;
+        & img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    }
 
-.next, .back {
-    position: absolute;
-    bottom: 0;
-    width: 32px;
-    height: 32px;
-    background: #CCC;  // TODO lighten(@grey, 20%);
-    // TODO .s-button;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    transform-origin: center top;
-    &.disabled { opacity: 0.2; }
-    .icon { width: 100%; height: 100%; }
-}
+    .next, .back {
+        position: absolute;
+        bottom: 0;
+        width: 32px;
+        height: 32px;
+        background: #CCC;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        transform-origin: center top;
+        &.disabled { opacity: 0.2; }
+        .icon { width: 100%; height: 100%; }
+    }
 
-.next { right: 0; }
-// TODO .next .icon { background-image: data-uri('../images/uri/tool-forward.svg'); }
-// TODO .back .icon { background-image: data-uri('../images/uri/tool-back.svg'); }
+    .next { right: 0; }
+    // TODO .next .icon { background-image: data-uri('../images/uri/tool-forward.svg'); }
+    // TODO .back .icon { background-image: data-uri('../images/uri/tool-back.svg'); }
 
-.dots {
-    left: 50%;
-    position: absolute;
-    bottom: 10px;
-    transform: translateX(-50%);
-}
+    .dots {
+        left: 50%;
+        position: absolute;
+        bottom: 10px;
+        transform: translateX(-50%);
+    }
 
-.dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 4px;
-    background: #000;
-    float: left;
-    margin: 4px;
-    opacity: 0.2;
-    transition: opacity .2s;
-    &.on { opacity: 0.8 }
+    .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 4px;
+        background: #000;
+        float: left;
+        margin: 4px;
+        opacity: 0.2;
+        transition: opacity .2s;
+        &.on { opacity: 0.8; }
+    }
+
 }

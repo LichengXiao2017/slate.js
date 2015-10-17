@@ -11,31 +11,27 @@ import Browser from 'browser';
 
 export default customElement('x-dropdown', {
 
-    created: function($el, $shadow) {
+    created: function($el) {
         let _this = this;
 
-        this.$title = $shadow.find('.dropdown-title');
-        this.$body = $shadow.find('.dropdown-body');
+        this.$title = $el.find('.dropdown-title');
+        this.$body = $el.find('.dropdown-body');
         this.isOpen = false;
 
         this.$title.on('click', function(e) {
             _this.toggle();
-            e.stopPropagation();
-        });
-
-        this.$body.on('click', function(e) {
-            e.stopPropagation();
         });
     },
 
-    attached: function($el, $shadow) {
+    attached: function($el) {
         var _this = this;
-        $body.on('click', function(e) {
+
+        $el.on('clickOutside', function(e) {
             _this.hide();
         });
     },
 
-    detached: function($el, $shadow) {
+    detached: function($el) {
         // TODO remove body event listener
     },
 

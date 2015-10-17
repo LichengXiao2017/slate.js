@@ -84,14 +84,14 @@ Browser.onKey('space up down left right pagedown pageup', function(e) {
 
 export default customElement('x-media', {
 
-    created: function($el, $shadow) {
-        let $wrap = $shadow.children(0);
+    created: function($el) {
+        let $wrap = $el.children(0);
         let src = $el.attr('src');
         let type = src.slice(-3);
 
         $wrap.css('width', $el.attr('width') + 'px');
         $wrap.css('height', $el.attr('height') + 'px');
-        $wrap.css('display', $el.css('display').replace(/^inline$/, 'inline-block'));
+        // $wrap.css('display', $el.css('display').replace(/^inline$/, 'inline-block'));
 
         // Create Elements
 

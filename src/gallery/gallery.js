@@ -13,16 +13,16 @@ import Browser from 'browser';
 
 export default customElement('x-gallery', {
 
-    created: function($el, $shadow) {
+    created: function($el) {
 
-        let $wrapper = $shadow.find('.wrapper');
-        let $panel = $shadow.find('.panel');
-        let $slides = $el.children();
+        let $wrapper = $el.find('.wrapper');
+        let $panel = $el.find('.panel');
+        let $slides = $panel.children();
 
-        var $next = $shadow.find('.next');
-        var $back = $shadow.find('.back');
-    
-        var $dotsBox = $shadow.find('.dots');
+        var $next = $el.find('.next');
+        var $back = $el.find('.back');
+
+        var $dotsBox = $el.find('.dots');
         var $dots = $slides.map(x => $N('div', { class: 'dot' }, $dotsBox));
 
 
@@ -174,11 +174,11 @@ export default customElement('x-gallery', {
         this.back = back;
     },
 
-    attached: function($el, $shadow) {
+    attached: function($el) {
         // TODO add event listener
     },
 
-    detached: function($el, $shadow) {
+    detached: function($el) {
         // TODO remove body event listener
     },
 

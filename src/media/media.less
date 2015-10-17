@@ -4,52 +4,63 @@
 // =============================================================================
 
 
-.wrap {
-    position: relative;
-    &.interactive { cursor: pointer; }
-}
+x-media {
+    .wrap {
+        display: block;
+        position: relative;
+        &.interactive {
+            cursor: pointer;
+        }
+    }
 
-.wrap img {
-    display: block;
-    max-width: 100%;
-}
+    .wrap img {
+        display: block;
+        max-width: 100%;
+    }
 
-.credit {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background: rgba(0,0,0,0.7);
-    padding: 2px 8px;
-    font-size: 10px;
-    color: #FFF;
-    opacity: 0;
-    transition: opacity .2s;
-    .wrap:hover & { opacity: 0.8; }
-}
+    .credit {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 2px 8px;
+        font-size: 10px;
+        color: #FFF;
+        opacity: 0;
+        transition: opacity .2s;
+        .wrap:hover & {
+            opacity: 0.8;
+        }
+    }
 
-.zoom, .play {
-    width: 36px;
-    height: 36px;
-    position: absolute;
-    background: rgba(0,0,0,0.7);
-}
+    .zoom, .play {
+        width: 36px;
+        height: 36px;
+        position: absolute;
+        background: rgba(0, 0, 0, 0.7);
+    }
 
-.zoom {
-    top: 0;
-    right: 0;
-    //background-image: data-uri('../images/uri/zoom.svg');
-    transition: opacity .2s;
-    opacity: 0.4;
-    .wrap:hover & { opacity: 0.9; }
-}
+    .zoom {
+        top: 0;
+        right: 0;
+        //background-image: data-uri('../images/uri/zoom.svg');
+        transition: opacity .2s;
+        opacity: 0.4;
+        .wrap:hover & {
+            opacity: 0.9;
+        }
+    }
 
-.play {
-    top: 50%;
-    left: 50%;
-    margin: -18px;
-    border-radius: 4px;
-    opacity: 0.9;
-    //background-image: data-uri('../images/uri/video.svg');
-    transition: transform .2s;
-    .wrap:hover & { transform: scale(0); }
+    .play {
+        top: 50%;
+        left: 50%;
+        margin: -18px;
+        border-radius: 4px;
+        opacity: 0.9;
+        //background-image: data-uri('../images/uri/video.svg');
+        transition: transform .2s;
+        .wrap:hover & {
+            transform: scale(0);
+        }
+    }
 }

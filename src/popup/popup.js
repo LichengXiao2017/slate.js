@@ -10,24 +10,23 @@ import Browser from 'browser';
 
 
 const MARGIN = 15;
-
-let activePopup;
-let $container;
-export function setContainer(el) { $container = el; }
-
+const $container = $body;
 
 export default customElement('x-popup', {
 
-    created: function($el, $shadow) {
-        
+    created: function($el) {
+
         let _this = this;
-        let $popup = $shadow.find('.popup');
-        let $box = $shadow.find('.popup-box');
-        let $bubble = $shadow.find('.popup-body');
-        let $target = $shadow.find('.target');
+        let isOpen = false;
+
+        let $target = $el.find('.target');
+        let $box = $el.find('.popup');
+        let $bubble = $el.find('.body');
 
         this.open = function() {
-            if (activePopup) activePopup.close();
+            if (isOpen) return;
+            isOpen = true;
+
             $box.show();
 
             // In off state, $bubble is scaled to 0.5 of the size.
@@ -49,31 +48,29 @@ export default customElement('x-popup', {
             Browser.redraw();
             if (top < MARGIN ) { $body.scrollBy(top - MARGIN); }
 
-            $popup.addClass('on');
-            activePopup = _this;
+            $el.addClass('on');
+            $box.addClass('on');
         };
 
         this.close = function() {
-            $popup.removeClass('on');
-            activePopup = null;
+            if (!isOpen) return;
+            isOpen = false;
+
+            $el.removeClass('on');
+            $box.removeClass('on');
             setTimeout( function(){ $box.hide(); }, 200);
         };
 
+        function click() { _this[isOpen ? 'close' : 'open'](); }
+        function clickOutside() { _this.close(); }
 
-        function click(e) {
-            e.preventDefault();
-            e.stopPropagation();
+        $target.on('click', click);
+        $el.on('clickOutside', clickOutside);
 
-            if ($popup.hasClass('on')) {
-                _this.close();
-            } else {
-                _this.open();
-            }
-        }
-
-        this.clear = function() { $popup.off('click', click); };
-        $bubble.on('click', function(e){ e.stopPropagation(); });
-        $popup.on('click', click);
+        this.clear = function() {
+            $target.off('click', click);
+            $el.off('clickOutside', clickOutside);
+        };
     },
 
     detached: function() {

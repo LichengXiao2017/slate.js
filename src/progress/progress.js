@@ -10,7 +10,7 @@ import Browser from 'browser';
 
 
 function draw() {
-    let $svg = this.$shadow.children(0);
+    let $svg = this.$el.children(0);
 
     let r = +this.$el.attr('r') || 10;
     let p = +this.$el.attr('p') || 0;
@@ -58,5 +58,5 @@ export default customElement('x-progress', {
     },
 
     template: '<svg style="margin: visible"></svg>'
- 
+
 });
