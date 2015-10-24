@@ -12,23 +12,16 @@ import Browser from 'browser';
 export default customElement('x-dropdown', {
 
     created: function($el) {
-        let _this = this;
-
         this.$title = $el.find('.dropdown-title');
         this.$body = $el.find('.dropdown-body');
-        this.isOpen = false;
 
-        this.$title.on('click', function(e) {
-            _this.toggle();
-        });
+        this.$body.hide();
+        this.isOpen = false;
+        this.$title.on('click', () => { this.toggle(); });
     },
 
     attached: function($el) {
-        var _this = this;
-
-        $el.on('clickOutside', function(e) {
-            _this.hide();
-        });
+        $el.on('clickOutside', () => { this.hide(); });
     },
 
     detached: function($el) {
@@ -55,8 +48,6 @@ export default customElement('x-dropdown', {
         } else {
             this.show();
         }
-    },
-
-    template: require('./dropdown.jade')
+    }
 
 });

@@ -28,10 +28,8 @@ x-media {
         color: #FFF;
         opacity: 0;
         transition: opacity .2s;
-        .wrap:hover & {
-            opacity: 0.8;
-        }
     }
+
 
     .zoom, .play {
         width: 36px;
@@ -46,9 +44,6 @@ x-media {
         //background-image: data-uri('../images/uri/zoom.svg');
         transition: opacity .2s;
         opacity: 0.4;
-        .wrap:hover & {
-            opacity: 0.9;
-        }
     }
 
     .play {
@@ -59,8 +54,11 @@ x-media {
         opacity: 0.9;
         //background-image: data-uri('../images/uri/video.svg');
         transition: transform .2s;
-        .wrap:hover & {
-            transform: scale(0);
-        }
+    }
+
+    .wrap:hover {
+        .credit { opacity: 0.8; }
+        .zoom { opacity: 0.9; }
+        .play { transform: scale(0); }
     }
 }

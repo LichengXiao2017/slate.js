@@ -12,12 +12,12 @@ import xSlider from 'slider/slider';
 
 export default customElement('x-img-sequence', {
 
-    created: function($el) {    
+    created: function($el) {
         let url = $el.attr('src');
         let pages = +$el.attr('pages') - 1;
         let size = { width: $el.attr('width'), height: $el.attr('height') };
 
-        let $img = $N('img', size, $el)
+        let $img = $N('img', size, $el);
         let $slider = $N('x-slider', { steps: pages }, $el);
 
         // preload images
@@ -31,6 +31,7 @@ export default customElement('x-img-sequence', {
 
         $slider.on('move', draw);
         draw(0);
-    }
+    },
 
+    styles: require('./imgSequence.less')
 });

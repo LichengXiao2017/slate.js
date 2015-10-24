@@ -33,7 +33,7 @@ export default customElement('x-target', {
     created: function($el) {
 
         let $bounds;
-        let query = 'body /deep/ ' + $el.attr('to');
+        let query = $el.attr('to');
 
         $el.on('mouseenter touchstart', function() {
 

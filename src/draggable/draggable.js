@@ -22,55 +22,53 @@ export default class Draggable extends Evented {
     constructor($el, $parent, direction = '', margin = 0) {
         super();
         let _this = this;
+        let lastPosn, noMove;
 
         this.$el = $el;
         this._posn = { x: null, y: null };
         this.move = { x: direction !== 'y', y: direction !== 'x' };
 
-        let lastPosn;
-        let width, height;
-
         function motionStart(e) {
             $body.on('pointerMove', motionMove);
             $body.on('pointerEnd', motionEnd);
             lastPosn = getPosn(e);
+            noMove = true;
             _this.trigger('start');
         }
 
         function motionMove(e) {
             e.preventDefault();
-            
+
             let newPosn = getPosn(e);
-            let x = clamp(_this._posn.x + newPosn.x - lastPosn.x, 0, width);
-            let y = clamp(_this._posn.y + newPosn.y - lastPosn.y, 0, height);
+            noMove = false;
+
+            let x = clamp(_this._posn.x + newPosn.x - lastPosn.x, 0, _this.width);
+            let y = clamp(_this._posn.y + newPosn.y - lastPosn.y, 0, _this.height);
 
             lastPosn = newPosn;
             _this.position = { x, y };
         }
 
-        function motionEnd(e) {
+        function motionEnd() {
             $body.off('pointerMove', motionMove);
             $body.off('pointerEnd', motionEnd);
-            
-            let newPosn = getPosn(e);
-            let noMove = (newPosn.x === lastPosn.x && newPosn.y === lastPosn.y);
             _this.trigger(noMove ? 'click' : 'end');
         }
 
         function resize() {
-            let oldWidth = width;
-            let oldHeight = height;
+            let oldWidth = _this.width;
+            let oldHeight = _this.height;
 
-            width  = $parent.width  - margin * 2;
-            height = $parent.height - margin * 2;
+            _this.width  = $parent.width  - margin * 2;
+            _this.height = $parent.height - margin * 2;
 
-            let x = width  / oldWidth  * _this._posn.x;
-            let y = height / oldHeight * _this._posn.y;
+            let x = _this.width  / oldWidth  * _this._posn.x;
+            let y = _this.height / oldHeight * _this._posn.y;
             _this.draw(x, y);
         }
 
         $el.on('pointerStart', motionStart);
-        
+
         Browser.resize(resize);
         resize();
     }

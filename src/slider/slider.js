@@ -5,7 +5,7 @@
 
 
 
-import { $N, customElement } from 'elements';
+import { $C, customElement } from 'elements';
 import Draggable from 'draggable/draggable';
 
 
@@ -13,20 +13,18 @@ export default customElement('x-slider', {
 
     created: function($track) {
 
-        $track.addClass('slider-track');
-        let $knob = $N('div', { class: 'slider-knob' }, $track);
-        $N('div', { class: 'icon' }, $knob);
+        let $knob = $C('knob', $track);
 
         let slider = new Draggable($knob, $track, 'x', 4);
-        let steps = +$track.attr('steps');
         let cancelPlay = false;
+        this.steps = +$track.attr('steps');
 
         slider.on('start', function() {
             cancelPlay = true;
         });
 
         slider.on('move', e => {
-            let n = Math.floor(e.x / e.width * steps);
+            let n = Math.floor(e.x / slider.width * this.steps);
             if (n !== this.current) {
                 this.$el.trigger('move', n);
             }
@@ -36,9 +34,9 @@ export default customElement('x-slider', {
         slider.on('click', () => { this.play(); });
 
         function animRender() {
-            var dim = slider.get();
-            if (!cancelPlay && dim.x < dim.width) M.animationFrame(animRender);
-            slider.set( dim.x + 2 );
+            let x = slider.position.x;
+            if (!cancelPlay && x < slider.width) window.requestAnimationFrame(animRender);
+            slider.position = { x: x + 2, y: 0 };
         }
 
         this.play = function() {
@@ -49,6 +47,12 @@ export default customElement('x-slider', {
 
         this.current = 0;
         slider.position = { x: 0, y: 0 };
-    }
+    },
 
+    attributes: {
+        steps: function(s) { this.steps = +s; }
+    },
+
+    styles: require('./slider.less'),
+    template: require('./slider.jade')
 });

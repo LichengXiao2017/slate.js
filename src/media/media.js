@@ -124,7 +124,7 @@ export default customElement('x-media', {
             $N('div', { class: 'credit', html: credit }, $wrap);
         }
 
-        // Lightboxex
+        // Lightboxes
 
         if ($el._el.hasAttribute('lightbox')) {
             $wrap.addClass('interactive');

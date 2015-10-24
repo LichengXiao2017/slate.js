@@ -7,7 +7,7 @@
 
 import { clamp } from 'utilities';
 import { $, $N, customElement, $body } from 'elements';
-import { animationFrame, animate, ease } from 'animate';
+import { animate, ease } from 'animate';
 import Browser from 'browser';
 
 
@@ -82,7 +82,7 @@ export default customElement('x-gallery', {
         }
 
         function animRender() {
-            if (!animCancel && animT < animDuration) animationFrame(animRender);
+            if (!animCancel && animT < animDuration) requestAnimationFrame(animRender);
             animSetPosition();
         }
 

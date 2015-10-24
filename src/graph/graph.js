@@ -5,11 +5,10 @@
 
 
 import { $, $$, $T, $C, $N, $body } from 'elements';
-import { pointerOffset } from 'dom-events';
+import { svgPointerPosn } from 'dom-events';
 import { nearlyEquals } from 'arithmetic';
 import { square, run, clamp } from 'utilities';
 import { Point } from 'geometry';
-import { animationFrame } from 'animate';
 import { list } from 'arrays';
 import Vector from 'vector';
 import Browser from 'browser';
@@ -23,7 +22,7 @@ export default class Graph extends Evented {
     constructor($svg, vertices, edges, options = {}) {
     	super();
         let _this = this;
-        
+
         this.options = options;
 
         this.$edges = $N('g', {}, $svg);
@@ -49,11 +48,11 @@ export default class Graph extends Evented {
                 markerHeight: '6',
                 orient: 'auto'
             }, $defs);
-            $N('path', { d: 'M0,-5L10,0L0,5', class: 'arrow' }, $marker);
+            $N('path', { d: 'M0,-5L10,0L0,5', 'class': 'arrow' }, $marker);
         }
 
         function onStart(e) {
-            let u = pointerOffset(e, $svg);
+            let u = svgPointerPosn(e, $svg);
 
             for (let i=0; i<_this.vertices.length; ++i) {
                 let v = _this.vertices[i];
@@ -74,12 +73,12 @@ export default class Graph extends Evented {
             e.preventDefault();
             e.stopPropagation();
             if (!_this.dragging) return;
-            _this.dragging.posn = pointerOffset(e, $svg);
+            _this.dragging.posn = svgPointerPosn(e, $svg);
             _this.redraw();
             _this.stable = false;
         }
 
-        function onEnd(e) {
+        function onEnd() {
             _this.dragging = null;
             $body.off('pointerMove', onMove);
             $body.off('pointerEnd', onEnd);
@@ -104,8 +103,9 @@ export default class Graph extends Evented {
             var x = posn ? (posn[v][0] || posn[v].x) : _this.width  * (0.3 + 0.4 * Math.random());
             var y = posn ? (posn[v][1] || posn[v].y) : _this.height * (0.3 + 0.4 * Math.random());
 
-            var $el = _this.options.icon ? $N('path', { 'class': 'node', d: _this.options.icon, }, _this.$vertices) :
-                          $N('circle', { 'class': 'node', r: _this.options.r || 5 }, _this.$vertices);
+            var $el = _this.options.icon ?
+                      $N('path', { 'class': 'node', d: _this.options.icon }, _this.$vertices) :
+                      $N('circle', { 'class': 'node', r: _this.options.r || 5 }, _this.$vertices);
             if (_this.options.vertex) $el.css('fill', run(_this.options.vertex, [v]));
             return { $el: $el, posn: { x: x, y: y }, neighbours: [], v: { x: 0, y: 0 } };
         });
@@ -146,7 +146,7 @@ export default class Graph extends Evented {
             if(_this.stable) {
                 _this.animating = false;
             } else {
-                animationFrame(tick);
+                window.requestAnimationFrame(tick);
                 _this.physics();
             }
         }
@@ -229,7 +229,7 @@ export default class Graph extends Evented {
 
                 e.$el.attr('d', 'M'+e.vertices[0].posn.x+','+e.vertices[0].posn.y+
                     'c'+v0[0]+','+v0[1]+','+v1[0]+','+v1[1]+',0,0');
-            
+
             // arcs
             } else if (_this.options.arc) {
                 var dx = e.vertices[1].posn.x - e.vertices[0].posn.x;
