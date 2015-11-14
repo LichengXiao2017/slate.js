@@ -29,17 +29,17 @@ export default customElement('x-dropdown', {
     },
 
     show: function() {
-        // TODO animate show
         if (this.isOpen) return;
-        this.$body.show();
         this.isOpen = true;
+        this.$el.addClass('open');
+        this.$body.enter(200, 'fade');
     },
 
     hide: function() {
-        // TODO animate hide
         if (!this.isOpen) return;
-        this.$body.hide();
         this.isOpen = false;
+        this.$el.removeClass('open');
+        this.$body.exit(200, 'fade');
     },
 
     toggle: function() {

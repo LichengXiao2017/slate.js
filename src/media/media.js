@@ -6,7 +6,7 @@
 
 
 import { isOneOf } from 'utilities';
-import { $, $N, customElement, $body } from 'elements';
+import { $, $C, $N, customElement, $body } from 'elements';
 import Browser from 'browser';
 
 
@@ -17,7 +17,6 @@ let isOpen = false;
 let transform = {};
 let $activeImg = null;
 
-Browser.addCSS(require('./lightbox.less'));
 const $lightbox        = $N('div', {'class': 'lightbox-overlay' }, $body);
 const $lightboxImg     = $N('div', {'class': 'lightbox-img' }, $lightbox);
 const $lightboxCaption = $N('div', {'class': 'lightbox-caption' }, $lightbox);
@@ -85,56 +84,64 @@ Browser.onKey('space up down left right pagedown pageup', function(e) {
 export default customElement('x-media', {
 
     created: function($el) {
-        let $wrap = $el.children(0);
         let src = $el.attr('src');
         let type = src.slice(-3);
 
-        $wrap.css('width', $el.attr('width') + 'px');
-        $wrap.css('height', $el.attr('height') + 'px');
-        // $wrap.css('display', $el.css('display').replace(/^inline$/, 'inline-block'));
+        $el.css('width', $el.attr('width') + 'px');
+        $el.css('height', $el.attr('height') + 'px');
+
+        let $media;
+        let $credit = $C('credit', $el);
+        let $play   = $C('play', $el);
+        let $zoom   = $C('zoom', $el);
+
 
         // Create Elements
 
-        if (isOneOf(type, 'jpg', 'png', 'gif')) {
-            $N('img', {
-                src: src
-            }, $wrap);
-
-        } else if (isOneOf(type, 'mp4', 'ogg')) {
-            let $video = $N('video', {
+        if (isOneOf(type, 'mp4', 'ogg')) {
+            $media = $N('video', {
                 width: '100%',
                 height: '100%',
                 poster: src.replace(/mp4$/, 'jpg'),
                 src: src
-            }, $wrap);
+            }, $el);
 
-            $video._el.preload = true;
-            $video._el.loop = true;
-            $video.on('mouseover touchdown', function() { $video._el.play(); });
-            $video.on('mouseout touchup', function() { $video._el.pause(); });
+            $media._el.preload = true;
+            $media._el.loop = true;
+            $media.on('mouseover touchdown', function() { $media._el.play(); });
+            $media.on('mouseout touchup', function() { $media._el.pause(); });
 
-            $wrap.addClass('interactive');
-            $wrap.append($N('div', { class: 'play' }));
+            $el.addClass('interactive');
+
+        } else {
+            $media = $N('img', { src: src }, $el);
+            $play.remove();
         }
+
+        $el.prepend($media);
+
 
         // Captions
 
         let credit = $el.attr('credit');
         if (credit) {
-            $N('div', { class: 'credit', html: credit }, $wrap);
+            $credit.text = credit;
+        } else {
+            $credit.remove();
         }
+
 
         // Lightboxes
 
         if ($el._el.hasAttribute('lightbox')) {
-            $wrap.addClass('interactive');
-            $wrap.append($N('div', { class: 'zoom' }));
-            var large = src.replace(/\.(?=[^.]*$)/, '-large.');
-            $wrap.on('click', function() { openLightbox($wrap, src, large); });
+            $el.addClass('interactive');
+            let large = src.replace(/\.(?=[^.]*$)/, '-large.');
+            $el.on('fastClick', function() { openLightbox($el, src, large); });
+        } else {
+            $zoom.remove();
         }
 
     },
 
-    template: '<div class="wrap"></div>',
-    styles: require('./media.less')
+    templateId: '#media'
 });

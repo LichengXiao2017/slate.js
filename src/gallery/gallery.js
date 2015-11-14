@@ -182,7 +182,5 @@ export default customElement('x-gallery', {
         // TODO remove body event listener
     },
 
-    template: require('./gallery.jade'),
-    styles: require('./gallery.less')
-
+    templateId: '#gallery'
 });

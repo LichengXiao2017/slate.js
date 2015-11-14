@@ -77,6 +77,5 @@ export default customElement('x-popup', {
         this.close();
     },
 
-    styles: require('./popup.less'),
-    template: require('./popup.jade')
+    templateId: '#popup'
 });

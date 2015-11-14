@@ -6,7 +6,7 @@
 
 
 import { $C, customElement } from 'elements';
-import Draggable from 'draggable/draggable';
+import Draggable from 'draggable';
 
 
 export default customElement('x-slider', {
@@ -53,6 +53,5 @@ export default customElement('x-slider', {
         steps: function(s) { this.steps = +s; }
     },
 
-    styles: require('./slider.less'),
-    template: require('./slider.jade')
+    templateId: '#slider'
 });

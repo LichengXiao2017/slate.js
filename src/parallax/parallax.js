@@ -52,7 +52,5 @@ export default customElement('x-parallax', {
         }
     },
 
-    template: require('./parallax.jade'),
-    styles: require('./parallax.less')
-
+    templateId: '#parallax'
 });

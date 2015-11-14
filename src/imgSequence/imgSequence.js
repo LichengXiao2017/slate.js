@@ -7,7 +7,7 @@
 
 import { $N, customElement } from 'elements';
 import { tabulate } from 'arrays';
-import xSlider from 'slider/slider';
+import xSlider from 'slider';
 
 
 export default customElement('x-img-sequence', {
@@ -31,7 +31,5 @@ export default customElement('x-img-sequence', {
 
         $slider.on('move', draw);
         draw(0);
-    },
-
-    styles: require('./imgSequence.less')
+    }
 });
