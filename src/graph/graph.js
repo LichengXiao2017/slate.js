@@ -5,7 +5,7 @@
 
 
 import { $, $$, $T, $C, $N, $body } from 'elements';
-import { svgPointerPosn } from 'dom-events';
+import { svgPointerPosn } from 'events';
 import { nearlyEquals } from 'arithmetic';
 import { square, run, clamp } from 'utilities';
 import { Point } from 'geometry';
@@ -34,8 +34,8 @@ export default class Graph extends Evented {
         this.stable = false;
         this.dragging = null;
 
-        this.width = $svg.width;
-        this.height = $svg.height;
+        this.width = $svg.innerWidth;
+        this.height = $svg.innerHeight;
 
         if (options.directed) {
             let $defs = $N('defs', {}, $svg);
