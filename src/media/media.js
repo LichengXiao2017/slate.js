@@ -87,8 +87,7 @@ export default customElement('x-media', {
         let src = $el.attr('src');
         let type = src.slice(-3);
 
-        $el.css('width', $el.attr('width') + 'px');
-        $el.css('height', $el.attr('height') + 'px');
+        $el.css('padding-bottom', (+$el.attr('height')) / (+$el.attr('width')) * 100 + '%');
 
         let $media;
         let $credit = $C('credit', $el);
