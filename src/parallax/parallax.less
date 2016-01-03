@@ -3,24 +3,14 @@ x-parallax {
     overflow: hidden;
     position: relative;
 
-    .image, .shadow {
+    .image {
         position: absolute;
-        top: 0;
         bottom: 0;
         left: 0;
         right: 0;
-    }
-
-    .image {
         background-size: cover;
         background-position: center;
         will-change: transform;
-    }
-
-    .shadow {
-        background: #000;
-        opacity: 0;
-        will-change: opacity;
     }
 
     .content {

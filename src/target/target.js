@@ -35,10 +35,10 @@ export default customElement('x-target', {
         let $bounds;
         let query = $el.attr('to');
 
-        $el.on('mouseenter touchstart', function() {
+        function enter() {
 
             let bounds = $$(query).map(x => x.bounds)
-                                  .filter(x => x.width && x.height);
+                .filter(x => x.width && x.height);
             if (!bounds.length) return;
 
             let top = Math.min(...bounds.map(x => x.top));
@@ -65,15 +65,15 @@ export default customElement('x-target', {
             $targets.enter(300, 'fade', scroll ? 300 : 0);
 
             /* TODO target arrows
-            var targetBounds = $el.offset();
-            var dx = bounds[0].geo.left + bounds[0].geo.width/2  - targetBounds.left - 17;
-            var dy = bounds[0].geo.top  + bounds[0].geo.height/2 - targetBounds.top  - 17 - scroll;
-            var angle = 45 + Math.atan2(dy, dx) * 180 / Math.PI;
-            $arrow.transform('rotate(' + Math.round(angle) + 'deg)');
-            */
-        });
+             var targetBounds = $el.offset();
+             var dx = bounds[0].geo.left + bounds[0].geo.width/2  - targetBounds.left - 17;
+             var dy = bounds[0].geo.top  + bounds[0].geo.height/2 - targetBounds.top  - 17 - scroll;
+             var angle = 45 + Math.atan2(dy, dx) * 180 / Math.PI;
+             $arrow.transform('rotate(' + Math.round(angle) + 'deg)');
+             */
+        }
 
-        $el.on('mouseleave touchend', function() {
+        function exit() {
             if (!$bounds) return;
             let $oldBounds = $bounds;
 
@@ -82,6 +82,15 @@ export default customElement('x-target', {
             setTimeout(function() {
                 $oldBounds.forEach(function($b) { $b.remove(); });
             }, 300);
+        }
+
+        $el.on('mouseenter touchstart', enter);
+        $el.on('mouseleave touchend', exit);
+
+        $el.on('click', function() {
+            console.log($(query));
+            $(query).trigger('click mousedown');
+            exit();
         });
 
     }

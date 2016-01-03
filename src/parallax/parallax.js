@@ -14,14 +14,18 @@ export default customElement('x-parallax', {
     created: function($el) {
         // TODO allow animation of multiple properties
         this.$bg   = $el.find('.image');
-        this.$blur = $el.find('.shadow');
     },
 
     attached: function($el) {
         let _this = this;
         let start, end;
 
-        this.$bg.css('background-image', 'url("' + this.getAttribute('background') + '")');
+        let isFirst = $el.positionTop < 50;
+
+        this.$bg.css({
+            'background-image': 'url("' + this.getAttribute('background') + '")',
+            'height': isFirst ? '100%' : '150%'
+        });
 
         function resize({ height }) {
             let top = $el.positionTop;
@@ -32,9 +36,11 @@ export default customElement('x-parallax', {
         function scroll(e) {
             if (e.top >= start && e.top <= end) {
                 let scale = (e.top - start) / (end - start);
-                let prop = Math.pow(1.5, scale);
-                _this.$bg.transform = 'scale(' + Math.max(1, prop) + ')';
-                // _this.$blur.css('opacity', scale * 0.5);
+                // for scale: let prop = Math.pow(1.5, scale);
+
+                _this.$bg._el.style.transform = 'translateY(' + scale*(isFirst ? 50 : 33) + '%)';
+                // _this.$bg._el.style.opacity = 1 - scale;
+                // _this.$bg.transform = 'scale(' + Math.max(1, prop) + ')';
             }
         }
 

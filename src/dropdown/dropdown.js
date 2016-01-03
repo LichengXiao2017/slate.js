@@ -18,6 +18,8 @@ export default customElement('x-dropdown', {
         this.$body.hide();
         this.isOpen = false;
         this.$title.on('click', () => { this.toggle(); });
+
+        $el.findAll('a').forEach($a => { $a.on('click', () => { this.hide(); }); });
     },
 
     attached: function($el) {

@@ -98,12 +98,7 @@ export default customElement('x-media', {
         // Create Elements
 
         if (isOneOf(type, 'mp4', 'ogg')) {
-            $media = $N('video', {
-                width: '100%',
-                height: '100%',
-                poster: src.replace(/mp4$/, 'jpg'),
-                src: src
-            }, $el);
+            $media = $N('video', { poster: src.replace(/mp4$/, 'jpg'), src: src }, $el);
 
             $media._el.preload = true;
             $media._el.loop = true;
