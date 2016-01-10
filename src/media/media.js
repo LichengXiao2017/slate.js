@@ -24,7 +24,8 @@ const $lightboxCaption = $N('div', {'class': 'lightbox-caption' }, $lightbox);
 function openLightbox($img, srcSmall, srcLarge) {
     isOpen = true;
     $activeImg = $img;
-    $lightbox.css('display', 'block');
+    $lightbox.show();
+    $lightboxImg.show();
 
     let newX = $img.bounds;
     let oldX = $lightboxImg.bounds;
