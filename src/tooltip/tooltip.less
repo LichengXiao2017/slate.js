@@ -4,30 +4,44 @@
 // =============================================================================
 
 
-x-tooltip {
-    display: block;
+
+.arrow(@posn, @origin, @center, @align) {
+    &.@{posn} {
+        transform-origin: @origin;
+        &:after {
+            @{center}: 50%;
+            @{align}: -12px;
+            margin-@{center}: -6px;
+            border-@{posn}-color: fade(black, 80%);
+        }
+    }
+}
+
+x-tooltip { display: none; }
+
+.tooltip {
     position: fixed;
     background: fade(black, 80%);
     color: white;
     font-size: 14px;
-    padding: 1px 10px;
+    padding: 2px 10px;
     pointer-events: none;
     z-index: 999;
+    border-radius: 3px;
 
-    transition: transform .3s, opacity .3s;
+    transition: transform .15s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity .15s;
     transform: scale(.5);
     opacity: 0;
-    transform-origin: center bottom;
     &.active { transform: none; opacity: 1; }
 
     &:after {
         content: " ";
         position: absolute;
-        left: 50%;
-        bottom: -8px;
-        margin-left: -8px;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-top: 8px solid fade(black, 80%);
+        border: 6px solid transparent;
     }
+
+    .arrow(top,    center bottom, left, bottom);
+    .arrow(bottom, center top,    left, top);
+    .arrow(left,   right  center, top,  right);
+    .arrow(right,  left   center, top,  left);
 }
