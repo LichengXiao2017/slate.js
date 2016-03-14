@@ -224,8 +224,8 @@ export default class Graph extends Evented {
                 if (!center) center = Point.average(..._this.vertices.map(v => v.posn));
 
                 var v = V(e.vertices[0].posn.x - center.x, e.vertices[0].posn.y - center.y).normalise();
-                var v0 = V(v[0] + v[1], v[1] - v[0]).scaled(40);
-                var v1 = V(v[0] - v[1], v[1] + v[0]).scaled(40);
+                var v0 = V(v[0] + v[1], v[1] - v[0]).scale(40);
+                var v1 = V(v[0] - v[1], v[1] + v[0]).scale(40);
 
                 e.$el.attr('d', 'M'+e.vertices[0].posn.x+','+e.vertices[0].posn.y+
                     'c'+v0[0]+','+v0[1]+','+v1[0]+','+v1[1]+',0,0');

@@ -41,7 +41,6 @@ export default customElement('x-slider', {
 
         this.play = function() {
             cancelPlay = false;
-            $knob.effect('pulse-down');
             animRender();
         };
 

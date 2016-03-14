@@ -5,6 +5,7 @@
 
 
 
+import { delay } from 'utilities';
 import { $, $N, $$, customElement, $body } from 'elements';
 import Browser from 'browser';
 
@@ -19,14 +20,38 @@ const $targets = $N('svg', {
         pointer-events: none;
         z-index: 900;
         opacity: 0;
+        transform: translateZ(0);
+        will-change: opacity;
         transition: opacity .3s;`,
-    'html': `<defs><mask id="masking">
-            <rect width="100%" height="100%" fill="white"/>
-        </mask> </defs>
-        <rect x="0" y="0" width="100%" height="100%" mask="url(#masking)" fill="white" opacity="0.9"/>`
+    'html': `<defs>
+            <mask id="masking"><rect width="100%" height="100%" fill="white"/></mask>
+        </defs>
+        <rect x="0" y="0" width="100%" height="100%" mask="url(#masking)" fill="white" opacity="0.9"/>
+        <path id="target-arrow" style="stroke:rgb(255,255,0); stroke-width:2"/>`
 }, $body);
 
+function isFixed($el) {
+    while($el && $el._el.style) {
+        if ($el.is('x-toolbox') || $el.is('header')) return true;
+        $el = $el.parent;
+    }
+}
+
+function connect(from, to, fromShift, toShift) {
+    let width  = (to.left + to.width/2) - (from.left + from.width/2);
+    let height = (to.top + to.height/2) - (from.top + from.height/2) + fromShift + toShift;
+
+    return [{
+        x: from.left + from.width/2  + width/10,
+        y: from.top  + from.height/2 + height/10 + fromShift
+    }, {
+        x: to.left + to.width/2  - width/10,
+        y: to.top  + to.height/2 - height/10 + toShift
+    }];
+}
+
 const $mask = $targets.find('mask');
+const $arrow = $targets.find('#target-arrow');
 let active = null;
 let $bounds = [];
 
@@ -36,74 +61,85 @@ export default customElement('x-target', {
     created: function($el) {
         let query = $el.attr('to');
         let noMargins = $el.hasAttribute('no-margins');
+        let sourceFixed;
 
         function enter() {
             active = true;
 
-            let bounds = $$(query).map(x => x.bounds).filter(x => x.width && x.height);
-            if (!bounds.length) return;
+            let $targets = $$(query);
+            if (!$targets.length) return null;
 
-            let top = Math.min(...bounds.map(x => x.top));
-            let bottom = Math.max(...bounds.map(x => x.top + x.height));
+            let targetFixed = isFixed($targets[0]);
+            if (sourceFixed == null) sourceFixed = isFixed($el);
 
-            let scrollUp = Browser.height - 20 - bottom;
-            let scrollDown = 20 + 40 - top;  // additional 40 for top navigation bar
+            let sourceBounds = $el.bounds;
+            let bounds = $targets.map(x => x.bounds).filter(x => x.width && x.height);
+            let scroll = 0;
 
-            let scroll = scrollUp < 0 ? scrollUp : scrollDown > 0 ? scrollDown : 0;
-            if (scroll) $body.scrollBy(-scroll, 300);
+            if (!targetFixed) {
+                let top = Math.min(...bounds.map(x => x.top));
+                let bottom = Math.max(...bounds.map(x => x.top + x.height));
+
+                let scrollUp = Browser.height - 20 - bottom;
+                let scrollDown = 20 + 40 - top;  // additional 40 for top navigation bar
+                scroll = scrollUp < 0 ? scrollUp : scrollDown > 0 ? scrollDown : 0;
+            }
 
             $bounds.forEach($b => { $b.remove(); });
-            $bounds = [$el.bounds].concat(bounds).map(function(b, i) {
-                let margin = (i && !noMargins) ? 10 : 4;  // the target element itself gets no margin
+            $bounds = [sourceBounds].concat(bounds).map(function(b, i) {
+                let margin = (i && !noMargins) ? 10 : 4;
                 return $N('rect', {
                     x: b.left - margin,
-                    y: b.top - margin + scroll,
+                    y: b.top - margin + (i || !sourceFixed ? scroll : 0),
                     width: b.width + 2 * margin,
                     height: b.height + 2 * margin,
                     rx: 4, ry: 4
                 }, $mask);
             });
 
-            $targets.css('display', 'block');
-            Browser.redraw();
-            setTimeout(function() { $targets.css('opacity', 1); }, scroll ? 300 : 0);
-
-            /* TODO target arrows
-             var targetBounds = $el.offset();
-             var dx = bounds[0].left + bounds[0].width/2  - targetBounds.left - 17;
-             var dy = bounds[0].top  + bounds[0].height/2 - targetBounds.top  - 17 - scroll;
-             var angle = 45 + Math.atan2(dy, dx) * 180 / Math.PI;
-             $arrow.transform('rotate(' + Math.round(angle) + 'deg)');
-             */
+            $arrow.points = connect(sourceBounds, bounds[0],
+                sourceFixed ? 0 : scroll, targetFixed ? 0 : scroll);
 
             return scroll;
         }
 
-        function exit() {
+        function show(scroll) {
+            if (!active) return;
+            if (scroll) $body.scrollBy(-scroll, 300);
+            $targets.css('display', 'block');
+            Browser.redraw();
+            delay(function() { $targets.css('opacity', 1); }, scroll ? 300 : 0);
+        }
+
+        function exit(e) {
             if (!active) return;
             active = false;
-            $targets.css('opacity', 0);
 
+            $targets.css('opacity', 0);
             setTimeout(function() {
                 if (!active) $targets.css('display', 'none');
             }, 300);
+
+            $body.off('mousewheel mousemove touchend touchmove', exit);
+            $el.off('mouseleave', exit);
         }
 
-        $el.on('mouseenter', function() {
-            let didScroll = enter();
-            if (didScroll) {
-                setTimeout(function() {
-                    $body.one('scroll mousemove', exit);
-                }, 400);
-            } else {
-                $body.one('mousewheel', exit);
-                $el.one('mouseleave', exit);
-            }
-        });
+        $el.on('mouseenter touchstart', function() {
+            let scroll = enter();
+            if (scroll == null) return;
 
-        $el.on('touchstart', function() {
-            enter();
-            $body.one('touchend touchmove', exit);
+            delay(function() {
+                show(scroll);
+                if (scroll && !sourceFixed) {
+                    setTimeout(function() {
+                        $el.off('mouseleave', exit);
+                        $body.on('mousemove', exit);
+                    }, 300);
+                }
+            }, scroll ? 30 : 60);
+
+            $body.on('mousewheel touchend touchmove', exit);
+            $el.on('mouseleave', exit);
         });
 
         $el.on('click', function() {

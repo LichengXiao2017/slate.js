@@ -34,14 +34,14 @@ export default customElement('x-dropdown', {
         if (this.isOpen) return;
         this.isOpen = true;
         this.$el.addClass('open');
-        this.$body.enter(200, 'fade');
+        this.$body.enter('fade', 200);
     },
 
     hide: function() {
         if (!this.isOpen) return;
         this.isOpen = false;
         this.$el.removeClass('open');
-        this.$body.exit(200, 'fade');
+        this.$body.exit('fade', 200);
     },
 
     toggle: function() {

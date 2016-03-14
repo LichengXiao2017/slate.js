@@ -1,9 +1,11 @@
+include ../../../mathigon.org/views/_templates/mixins
+
 template#gallery
   .wrapper
     .panel
       content
-  .next
-    .icon
-  .back
-    .icon
+  .btn.btn-bounce.next
+    +icon('right', 32)
+  .btn.btn-bounce.back
+    +icon('left', 32)
   .dots

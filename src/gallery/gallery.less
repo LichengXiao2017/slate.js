@@ -38,20 +38,20 @@ x-gallery {
 
     .next, .back {
         position: absolute;
+        display: block;
         bottom: 0;
         width: 32px;
         height: 32px;
-        background: #CCC;
+        padding: 0;
+        min-width: 0;
         border-top-left-radius: 0;
         border-top-right-radius: 0;
         transform-origin: center top;
-        &.disabled { opacity: 0.2; }
-        .icon { width: 100%; height: 100%; }
+        &.disabled { z-index: -1; }
+        .icon { margin: 0; display: block; }
     }
 
     .next { right: 0; }
-    // TODO .next .icon { background-image: data-uri('../images/uri/tool-forward.svg'); }
-    // TODO .back .icon { background-image: data-uri('../images/uri/tool-back.svg'); }
 
     .dots {
         left: 50%;

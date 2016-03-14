@@ -98,18 +98,12 @@ export default customElement('x-gallery', {
 
         function next() {
             animTiming = 'quad';
-            if (activeIndex < slidesCount - slidesPerPage) {
-                $next.effect('pulse-down');
-                startAnimationTo(activeIndex+1);
-            }
+            if (activeIndex < slidesCount - slidesPerPage) startAnimationTo(activeIndex+1);
         }
 
         function back() {
             animTiming = 'quad';
-            if (activeIndex > 0) {
-                $back.effect('pulse-down');
-                startAnimationTo(activeIndex-1);
-            }
+            if (activeIndex > 0) startAnimationTo(activeIndex-1);
         }
 
         $next.on('click', next);
