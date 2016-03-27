@@ -131,7 +131,7 @@ export default customElement('x-media', {
         if ($el._el.hasAttribute('lightbox')) {
             $el.addClass('interactive');
             let large = src.replace(/\.(?=[^.]*$)/, '-large.');
-            $el.on('fastClick', function() { openLightbox($el, src, large); });
+            $el.on('click', function() { openLightbox($el, src, large); });
         } else {
             $zoom.remove();
         }

@@ -8,6 +8,10 @@
 x-popup {
     display: inline-block;
     position: relative;
+    user-select: none;
+    touch-action: manipulation;
+
+    & > .content { display: none; }
 
     .popup {
         width: 140px;

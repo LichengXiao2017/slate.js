@@ -9,13 +9,8 @@ import { $body } from 'elements';
 import Evented from 'evented';
 import Browser from 'browser';
 import { clamp } from 'utilities';
+import { slide } from 'events';
 
-
-function getPosn(e) {
-    let x = event.touches ? e.touches[0].clientX : e.clientX;
-    let y = event.touches ? e.touches[0].clientY : e.clientY;
-    return { x, y };
-}
 
 export default class Draggable extends Evented {
 
@@ -28,34 +23,27 @@ export default class Draggable extends Evented {
         this._posn = { x: null, y: null };
         this.move = { x: direction !== 'y', y: direction !== 'x' };
 
-        function motionStart(e) {
-            $body.on('pointerMove', motionMove);
-            $body.on('pointerEnd', motionEnd);
-            lastPosn = getPosn(e);
-            noMove = true;
-            _this.trigger('start');
-        }
+        slide($el, {
+            start: function(posn) {
+                lastPosn = posn;
+                noMove = true;
+                _this.trigger('start');
+            },
+            move: function(posn) {
+                noMove = false;
 
-        function motionMove(e) {
-            e.preventDefault();
+                let x = clamp(_this._posn.x + posn.x - lastPosn.x, 0, _this.width);
+                let y = clamp(_this._posn.y + posn.y - lastPosn.y, 0, _this.height);
 
-            let newPosn = getPosn(e);
-            noMove = false;
+                lastPosn = posn;
+                _this.position = { x, y };
+            },
+            end: function() {
+                _this.trigger(noMove ? 'click' : 'end');
+            }
+        });
 
-            let x = clamp(_this._posn.x + newPosn.x - lastPosn.x, 0, _this.width);
-            let y = clamp(_this._posn.y + newPosn.y - lastPosn.y, 0, _this.height);
-
-            lastPosn = newPosn;
-            _this.position = { x, y };
-        }
-
-        function motionEnd() {
-            $body.off('pointerMove', motionMove);
-            $body.off('pointerEnd', motionEnd);
-            _this.trigger(noMove ? 'click' : 'end');
-        }
-
-        function resize() {
+        Browser.resize(function () {
             let oldWidth = _this.width;
             let oldHeight = _this.height;
 
@@ -65,12 +53,7 @@ export default class Draggable extends Evented {
             let x = _this.width  / oldWidth  * _this._posn.x;
             let y = _this.height / oldHeight * _this._posn.y;
             _this.draw(x, y);
-        }
-
-        $el.on('pointerStart', motionStart);
-
-        Browser.resize(resize);
-        resize();
+        });
     }
 
     get position() {

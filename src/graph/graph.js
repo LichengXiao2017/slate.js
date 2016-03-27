@@ -4,14 +4,13 @@
 // =============================================================================
 
 
-import { $, $$, $T, $C, $N, $body } from 'elements';
-import { svgPointerPosn } from 'events';
+import { $N } from 'elements';
+import { slide } from 'events';
 import { nearlyEquals } from 'arithmetic';
 import { square, run, clamp } from 'utilities';
 import { Point } from 'geometry';
 import { list } from 'arrays';
 import Vector from 'vector';
-import Browser from 'browser';
 import Evented from 'evented';
 
 
@@ -34,8 +33,8 @@ export default class Graph extends Evented {
         this.stable = false;
         this.dragging = null;
 
-        this.width = $svg.innerWidth;
-        this.height = $svg.innerHeight;
+        this.width = $svg.svgWidth;
+        this.height = $svg.svgHeight;
 
         if (options.directed) {
             let $defs = $N('defs', {}, $svg);
@@ -51,40 +50,29 @@ export default class Graph extends Evented {
             $N('path', { d: 'M0,-5L10,0L0,5', 'class': 'arrow' }, $marker);
         }
 
-        function onStart(e) {
-            let u = svgPointerPosn(e, $svg);
-
-            for (let i=0; i<_this.vertices.length; ++i) {
-                let v = _this.vertices[i];
-                if (Point.distance(u, v.posn) < 18) {
-                    _this.dragging = v;
-                    _this.dragging.posn = u;
-                    _this.stable = false;
-                    _this.redraw();
-                    break;
+        slide($svg, {
+            start: function(posn) {
+                for (let v of _this.vertices) {
+                    if (Point.distance(posn, v.posn) < 18) {
+                        _this.dragging = v;
+                        _this.dragging.posn = posn;
+                        _this.stable = false;
+                        _this.redraw();
+                        break;
+                    }
                 }
+            },
+            move: function(posn) {
+                if (!_this.dragging) return;
+                _this.dragging.posn = posn;
+                _this.redraw();
+                _this.stable = false;
+            },
+            end: function() {
+                _this.dragging = null;
             }
+        });
 
-            $body.on('pointerMove', onMove);
-            $body.on('pointerEnd', onEnd);
-        }
-
-        function onMove(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (!_this.dragging) return;
-            _this.dragging.posn = svgPointerPosn(e, $svg);
-            _this.redraw();
-            _this.stable = false;
-        }
-
-        function onEnd() {
-            _this.dragging = null;
-            $body.off('pointerMove', onMove);
-            $body.off('pointerEnd', onEnd);
-        }
-
-        $svg.on('pointerStart', onStart);
         this.load(vertices, edges, options.posn);
     }
 

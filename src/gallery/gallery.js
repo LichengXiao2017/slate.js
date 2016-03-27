@@ -9,6 +9,7 @@ import { clamp } from 'utilities';
 import { $, $N, customElement, $body } from 'elements';
 import { animate, ease } from 'animate';
 import Browser from 'browser';
+import { slide } from 'events';
 
 
 export default customElement('x-gallery', {
@@ -118,47 +119,35 @@ export default customElement('x-gallery', {
         var previousMotionX = null;
         var lastMotionX = null;
 
-        function motionStart(e) {
-            $body.on('pointerMove', motionMove);
-            $body.on('pointerEnd', motionEnd);
-            animCancel = true;
-            motionStartPosn = translateX;
-            pointerStart = event.touches ? event.touches[0].clientX : event.clientX;
-            lastMotionX = previousMotionX = pointerStart;
-        }
+        slide($wrapper, {
+            start: function(posn) {
+                animCancel = true;
+                motionStartPosn = translateX;
+                pointerStart = posn.x;
+                lastMotionX = previousMotionX = pointerStart;
+            },
+            move: function(posn) {
+                previousMotionX = lastMotionX;
+                lastMotionX = posn.x;
+                let newPosition = motionStartPosn - pointerStart + posn.x;
+                let maxScroll = -(slidesCount - slidesPerPage) * slideWidth;
 
-        function motionMove(e) {
-            e.preventDefault();
+                // Add resistance at ends of slider
+                let x = newPosition > 0 ? newPosition/4 :
+                        newPosition < maxScroll ? maxScroll + (newPosition - maxScroll)/4 :
+                        newPosition;
 
-            var x = event.touches ? event.touches[0].clientX : event.clientX;
-            previousMotionX = lastMotionX;
-            lastMotionX = x;
-            var newPosition = motionStartPosn - pointerStart + x;
-            var maxScroll = -(slidesCount - slidesPerPage) * slideWidth;
+                setPosition(x);
+            },
+            end: function() {
+                var lastDiff = lastMotionX - previousMotionX;
+                var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
 
-            // Add resistance at ends of slider
-            if (newPosition > 0) {
-                setPosition(newPosition/4);
-            } else if (newPosition < maxScroll) {
-                setPosition(maxScroll + (newPosition - maxScroll)/4);
-            } else {
-                setPosition(newPosition);
+                animTiming = 'quad-out';
+                startAnimationTo(clamp(Math.round(-translateX/slideWidth - shift), 0,
+                    slidesCount - slidesPerPage));
             }
-        }
-
-        function motionEnd(e) {
-            $body.off('pointerMove', motionMove);
-            $body.off('pointerEnd', motionEnd);
-
-            var x = event.touches ? event.touches[0].clientX : event.clientX;
-            var lastDiff = lastMotionX - previousMotionX;
-            var shift = lastDiff > 12 ? 1 : lastDiff < -12 ? -1 : 0;
-
-            animTiming = 'quad-out';
-            startAnimationTo(clamp(Math.round(-translateX/slideWidth - shift), 0, slidesCount - slidesPerPage));
-        }
-
-        $wrapper.on('pointerStart', motionStart);
+        });
 
         // ---------------------------------------------------------------------
 

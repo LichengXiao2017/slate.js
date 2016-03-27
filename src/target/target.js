@@ -142,8 +142,9 @@ export default customElement('x-target', {
             $el.on('mouseleave', exit);
         });
 
-        $el.on('click', function() {
+        $el.on('click', function(e) {
             $(query).trigger('click mousedown');
+            e.handled = true;
             exit();
         });
 

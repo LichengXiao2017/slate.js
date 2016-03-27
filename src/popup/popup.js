@@ -10,6 +10,7 @@ import Browser from 'browser';
 
 
 const MARGIN = 15;
+const MARGINTOP = 50;
 const $container = $body;
 
 export default customElement('x-popup', {
@@ -46,7 +47,7 @@ export default customElement('x-popup', {
                 $bubble.translateX(pageRight - MARGIN - right);
 
             Browser.redraw();
-            if (top < MARGIN ) { $body.scrollBy(top - MARGIN); }
+            if (top < MARGINTOP ) { $body.scrollBy(top - MARGINTOP); }
 
             $el.addClass('on');
             $box.addClass('on');
