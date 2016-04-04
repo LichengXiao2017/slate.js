@@ -26,8 +26,11 @@ const $targets = $N('svg', {
     'html': `<defs>
             <mask id="masking"><rect width="100%" height="100%" fill="white"/></mask>
         </defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+          <path d="M 0 0 L 10 5 L 0 10 z"/>
+        </marker>
         <rect x="0" y="0" width="100%" height="100%" mask="url(#masking)" fill="white" opacity="0.9"/>
-        <path id="target-arrow" style="stroke:rgb(255,255,0); stroke-width:2"/>`
+        <path id="target-arrow" stroke="black" stroke-width="5" marker-end="url(#arrow)" opacity="0.3" stroke-linecap="round"/>`
 }, $body);
 
 function isFixed($el) {
