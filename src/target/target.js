@@ -6,9 +6,12 @@
 
 
 import { delay } from 'utilities';
+import { projectPointOnRect } from 'geometry';
 import { $, $N, $$, customElement, $body } from 'elements';
 import Browser from 'browser';
 
+
+const $fixed = $$('x-toolbox, header, .toast-panel');  // TODO make this mathigon-independent
 
 const $targets = $N('svg', {
     'class': 'target-body',
@@ -33,29 +36,21 @@ const $targets = $N('svg', {
         <path id="target-arrow" stroke="black" stroke-width="5" marker-end="url(#arrow)" opacity="0.3" stroke-linecap="round"/>`
 }, $body);
 
-function isFixed($el) {
-    while($el && $el._el.style) {
-        if ($el.is('x-toolbox') || $el.is('header')) return true;
-        $el = $el.parent;
-    }
-}
-
 function connect(from, to, fromShift, toShift) {
-    let width  = (to.left + to.width/2) - (from.left + from.width/2);
-    let height = (to.top + to.height/2) - (from.top + from.height/2) + fromShift + toShift;
+    let fromRect = { x: from.left - 15, y: from.top + fromShift - 15, w: from.width + 30, h: from.height + 30 };
+    let start = projectPointOnRect({ x: to.left + to.width/2, y: to.top + to.height/2 + toShift }, fromRect);
 
-    return [{
-        x: from.left + from.width/2  + width/10,
-        y: from.top  + from.height/2 + height/10 + fromShift
-    }, {
-        x: to.left + to.width/2  - width/10,
-        y: to.top  + to.height/2 - height/10 + toShift
-    }];
+    let toRect = { x: to.left - 15, y: to.top + toShift - 15, w: to.width + 30, h: to.height + 30 };
+    let end = projectPointOnRect({ x: from.left + from.width/2, y: from.top + from.height/2 + fromShift }, toRect);
+
+    return [start, end];
 }
+
+function distance(a, b) { return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]); }
 
 const $mask = $targets.find('mask');
 const $arrow = $targets.find('#target-arrow');
-let active = null;
+let active = false;
 let $bounds = [];
 
 
@@ -66,18 +61,22 @@ export default customElement('x-target', {
         let noMargins = $el.hasAttribute('no-margins');
         let sourceFixed;
 
+        let start = null;
+        let scroll = null;
+        let showTimeout = null;
+
         function enter() {
             active = true;
 
             let $targets = $$(query);
-            if (!$targets.length) return null;
+            if (!$targets.length) return;
 
-            let targetFixed = isFixed($targets[0]);
-            if (sourceFixed == null) sourceFixed = isFixed($el);
+            let targetFixed = $targets[0].hasParent(...$fixed);
+            if (sourceFixed == null) sourceFixed = $el.hasParent(...$fixed);
 
             let sourceBounds = $el.bounds;
             let bounds = $targets.map(x => x.bounds).filter(x => x.width && x.height);
-            let scroll = 0;
+            scroll = 0;
 
             if (!targetFixed) {
                 let top = Math.min(...bounds.map(x => x.top));
@@ -102,12 +101,9 @@ export default customElement('x-target', {
 
             $arrow.points = connect(sourceBounds, bounds[0],
                 sourceFixed ? 0 : scroll, targetFixed ? 0 : scroll);
-
-            return scroll;
         }
 
-        function show(scroll) {
-            if (!active) return;
+        function show() {
             if (scroll) $body.scrollBy(-scroll, 300);
             $targets.css('display', 'block');
             Browser.redraw();
@@ -116,39 +112,41 @@ export default customElement('x-target', {
 
         function exit(e) {
             if (!active) return;
+            if (e.type == 'mousemove' && distance(start, [e.clientX, e.clientY ]) < 40) return;
+
+            clearTimeout(showTimeout);
             active = false;
 
             $targets.css('opacity', 0);
-            setTimeout(function() {
-                if (!active) $targets.css('display', 'none');
-            }, 300);
+            setTimeout(function() { if (!active) $targets.css('display', 'none'); }, 300);
 
             $body.off('mousewheel mousemove touchend touchmove', exit);
             $el.off('mouseleave', exit);
         }
 
-        $el.on('mouseenter touchstart', function() {
-            let scroll = enter();
-            if (scroll == null) return;
+        $el.on('mouseenter touchstart', function(e) {
+            start = [e.clientX, e.clientY];
+            enter();
+            showTimeout = setTimeout(show, scroll ? 50 : 30);
 
-            delay(function() {
-                show(scroll);
-                if (scroll && !sourceFixed) {
-                    setTimeout(function() {
-                        $el.off('mouseleave', exit);
-                        $body.on('mousemove', exit);
-                    }, 300);
-                }
-            }, scroll ? 30 : 60);
-
+            if (scroll && !sourceFixed) {
+                $body.on('mousemove', exit);
+            } else {
+                $el.on('mouseleave', exit);
+            }
             $body.on('mousewheel touchend touchmove', exit);
-            $el.on('mouseleave', exit);
         });
 
         $el.on('click', function(e) {
-            $(query).trigger('click mousedown');
-            e.handled = true;
-            exit();
+            if (active) {
+                $(query).trigger('click mousedown');
+                e.handled = true;
+                exit({});
+            } else {
+                active = true;
+                scroll = 0;
+                show();
+            }
         });
 
     }

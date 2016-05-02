@@ -108,6 +108,17 @@ export default customElement('x-media', {
 
             $el.addClass('interactive');
 
+        } else if (type == 'gif') {
+            let poster = src.replace(/gif$/, 'png');
+            let img = new Image();
+            img.src = src;
+
+            $media = $N('img', { src: poster }, $el);
+            $media.on('mouseover touchdown', function() { $media.attr('src', src); });
+            $media.on('mouseout touchup', function() { $media.attr('src', poster); });
+
+            $el.addClass('interactive');
+
         } else {
             $media = $N('img', { src: src }, $el);
             $play.remove();

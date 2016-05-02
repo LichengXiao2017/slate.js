@@ -10,11 +10,12 @@ import Evented from 'evented';
 import Browser from 'browser';
 import { clamp } from 'utilities';
 import { slide } from 'events';
+import { roundTo } from 'arithmetic';
 
 
 export default class Draggable extends Evented {
 
-    constructor($el, $parent, direction = '', margin = 0) {
+    constructor($el, $parent, direction = '', margin = 0, useTransform = false, snap = null) {
         super();
         let _this = this;
         let lastPosn, noMove;
@@ -22,6 +23,8 @@ export default class Draggable extends Evented {
         this.$el = $el;
         this._posn = { x: null, y: null };
         this.move = { x: direction !== 'y', y: direction !== 'x' };
+        this.useTransform = useTransform;
+        this.snap = snap;
 
         slide($el, {
             start: function(posn) {
@@ -67,8 +70,17 @@ export default class Draggable extends Evented {
     }
 
     draw({ x, y }) {
-        if (this.move.x) this.$el.css('left', Math.round(x) + 'px');
-        if (this.move.y) this.$el.css('top',  Math.round(y) + 'px');
+        if (this.snap) {
+            x = roundTo(x, this.snap);
+            y = roundTo(y, this.snap);
+        }
+
+        if (this.useTransform) {
+            this.$el.translate(this.move.x ? Math.round(x) : 0, this.move.y ? Math.round(y) : 0);
+        } else {
+            if (this.move.x) this.$el.css('left', Math.round(x) + 'px');
+            if (this.move.y) this.$el.css('top',  Math.round(y) + 'px');
+        }
     }
 
 }

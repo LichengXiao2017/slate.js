@@ -6,8 +6,8 @@
 
 
 import { clamp } from 'utilities';
-import { $, $N, customElement, $body } from 'elements';
-import { animate, ease } from 'animate';
+import { $N, customElement, $body } from 'elements';
+import { ease } from 'animate';
 import Browser from 'browser';
 import { slide } from 'events';
 
