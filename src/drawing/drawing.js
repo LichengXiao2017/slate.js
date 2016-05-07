@@ -7,8 +7,8 @@
 
 import Evented from 'evented';
 import { last } from 'arrays';
-import { $N, customElement } from 'elements';
-import { Point, Line } from 'geometry';
+import { $N } from 'elements';
+import { Point, Line, lineLineIntersect } from 'geometry';
 import { svgPointerPosn, stopEvent } from 'events';
 
 
@@ -81,6 +81,11 @@ export default class Drawing extends Evented {
         this.trigger('clear');
     }
 
+    clearPaths(paths) {
+        paths.forEach(p => { p.exit('draw', 200); });
+        this.paths = this.paths.filter(p => paths.indexOf(p) < 0);
+    }
+
     checkForIntersects() {
         if (!this.options.intersect || this.paths.length <= 1) return;
 
@@ -90,10 +95,10 @@ export default class Drawing extends Evented {
 
         for (var i = 0; i < this.paths.length - 1; ++i) {
             var path2 = this.paths[i];
-            var points2 = path2.getPoints();
+            var points2 = path2.points;
             for (var j = 1; j < points2.length - 2; ++j) {
                 var line2 = new Line(points2[j], points2[j + 1]);
-                var t = intersect(line1, line2);
+                var t = lineLineIntersect(line1, line2);
                 if (t) {
                     this.trigger('intersect', { point: t, paths: [path1, path2] });
                     return;
