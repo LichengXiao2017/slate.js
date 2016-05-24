@@ -6,7 +6,9 @@
 
 
 import { isOneOf } from 'utilities';
-import { $, $C, $N, customElement, $body } from 'elements';
+import { $C, $N, customElement, $body } from 'elements';
+import { pointerPosition } from 'events';
+import { Point } from 'geometry';
 import Browser from 'browser';
 
 
@@ -19,7 +21,6 @@ let $activeImg = null;
 
 const $lightbox        = $N('div', {'class': 'lightbox-overlay' }, $body);
 const $lightboxImg     = $N('div', {'class': 'lightbox-img' }, $lightbox);
-const $lightboxCaption = $N('div', {'class': 'lightbox-caption' }, $lightbox);
 
 function openLightbox($img, srcSmall, srcLarge) {
     isOpen = true;
@@ -142,7 +143,13 @@ export default customElement('x-media', {
         if ($el._el.hasAttribute('lightbox')) {
             $el.addClass('interactive');
             let large = src.replace(/\.(?=[^.]*$)/, '-large.');
-            $el.on('click', function() { openLightbox($el, src, large); });
+
+            let start = null;
+            $el.on('pointerStart', function(e) { start = pointerPosition(e); });
+            $el.on('pointerEnd', function(e) {
+                if (Point.distance(start, pointerPosition(e)) < 10) openLightbox($el, src, large);
+            });
+
         } else {
             $zoom.remove();
         }
