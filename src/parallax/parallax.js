@@ -5,7 +5,7 @@
 
 
 
-import { $, customElement, $body } from 'elements';
+import { customElement, $body } from 'elements';
 import Browser from 'browser';
 
 
