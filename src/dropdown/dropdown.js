@@ -6,7 +6,6 @@
 
 
 import { $, customElement, $body } from 'elements';
-import Browser from 'browser';
 
 
 export default customElement('x-dropdown', {
@@ -15,7 +14,6 @@ export default customElement('x-dropdown', {
         this.$title = $el.find('.dropdown-title');
         this.$body = $el.find('.dropdown-body');
 
-        this.$body.hide();
         this.isOpen = false;
         this.$title.on('click', () => { this.toggle(); });
 
