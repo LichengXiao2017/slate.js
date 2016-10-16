@@ -25,14 +25,17 @@ export default class Draggable extends Evented {
         this.move = { x: direction !== 'y', y: direction !== 'x' };
         this.useTransform = useTransform;
         this.snap = snap;
+        this.disabled = false;
 
         slide($el, {
             start: function(posn) {
+                if (_this.disabled) return;
                 lastPosn = posn;
                 noMove = true;
                 _this.trigger('start');
             },
             move: function(posn) {
+                if (_this.disabled) return;
                 noMove = false;
 
                 let x = clamp(_this._posn.x + posn.x - lastPosn.x, 0, _this.width);
@@ -40,8 +43,10 @@ export default class Draggable extends Evented {
 
                 lastPosn = posn;
                 _this.position = { x, y };
+                _this.trigger('drag');
             },
             end: function() {
+                if (_this.disabled) return;
                 _this.trigger(noMove ? 'click' : 'end');
             }
         });
@@ -55,7 +60,7 @@ export default class Draggable extends Evented {
 
             let x = _this.width  / oldWidth  * _this._posn.x;
             let y = _this.height / oldHeight * _this._posn.y;
-            _this.draw(x, y);
+            _this.draw({ x, y });
         });
     }
 
