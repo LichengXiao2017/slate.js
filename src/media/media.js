@@ -1,6 +1,6 @@
 // =============================================================================
 // Slate.js | Media Elements
-// (c) 2015 Mathigon
+// (c) 2017 Mathigon
 // =============================================================================
 
 
@@ -23,60 +23,60 @@ const $lightbox        = $N('div', {'class': 'lightbox-overlay' }, $body);
 const $lightboxImg     = $N('div', {'class': 'lightbox-img' }, $lightbox);
 
 function openLightbox($img, srcSmall, srcLarge) {
-    isOpen = true;
-    $activeImg = $img;
-    $lightbox.show();
-    $lightboxImg.show();
+  isOpen = true;
+  $activeImg = $img;
+  $lightbox.show();
+  $lightboxImg.show();
 
-    let newX = $img.bounds;
-    let oldX = $lightboxImg.bounds;
+  let newX = $img.bounds;
+  let oldX = $lightboxImg.bounds;
 
-    let x = newX.left + newX.width /2 - oldX.left - oldX.width /2;
-    let y = newX.top  + newX.height/2 - oldX.top  - oldX.height/2;
-    let s = Math.max(newX.width/oldX.width, newX.height/oldX.height);
-    transform = { x, y, s };
+  let x = newX.left + newX.width /2 - oldX.left - oldX.width /2;
+  let y = newX.top  + newX.height/2 - oldX.top  - oldX.height/2;
+  let s = Math.max(newX.width/oldX.width, newX.height/oldX.height);
+  transform = { x, y, s };
 
-    $lightboxImg.css('background-image', `url(${srcLarge}), url(${srcSmall})`);
-    $lightboxImg.transform = `translate(${x}px, ${y}px) scale(${s})`;
-    // FUTURE caption text
+  $lightboxImg.css('background-image', `url(${srcLarge}), url(${srcSmall})`);
+  $lightboxImg.transform = `translate(${x}px, ${y}px) scale(${s})`;
+  // FUTURE caption text
 
-    Browser.redraw();
-    $lightboxImg.addClass('transitions');
-    Browser.redraw();
+  Browser.redraw();
+  $lightboxImg.addClass('transitions');
+  Browser.redraw();
 
-    $img.css('visibility', 'hidden');
-    $lightbox.addClass('on');
-    $lightboxImg.transform = 'scale(1) translate(0,0)';
+  $img.css('visibility', 'hidden');
+  $lightbox.addClass('on');
+  $lightboxImg.transform = 'scale(1) translate(0,0)';
 }
 
 function closeLightbox() {
-    if (!isOpen) return;
-    isOpen = false;
+  if (!isOpen) return;
+  isOpen = false;
 
-    $lightbox.removeClass('on');
-    $lightboxImg.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.s})`;
+  $lightbox.removeClass('on');
+  $lightboxImg.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.s})`;
 
-    setTimeout( function() {
-        $activeImg.css('visibility', 'visible');
-        $lightbox.css('display', 'none');
-        $lightboxImg.transform = 'none';
-        $lightboxImg.removeClass('transitions');
-    }, 400);
+  setTimeout( function() {
+    $activeImg.css('visibility', 'visible');
+    $lightbox.css('display', 'none');
+    $lightboxImg.transform = 'none';
+    $lightboxImg.removeClass('transitions');
+  }, 400);
 }
 
 $lightbox.on('click', closeLightbox);
 Browser.onKey('escape', closeLightbox);
 
 $lightbox.on('scrollwheel touchmove', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 });
 
 Browser.onKey('space up down left right pagedown pageup', function(e) {
-    if (isOpen) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
+  if (isOpen) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 });
 
 
@@ -85,76 +85,75 @@ Browser.onKey('space up down left right pagedown pageup', function(e) {
 
 export default customElement('x-media', {
 
-    created: function($el) {
-        let src = $el.attr('src');
-        let type = src.slice(-3);
+  created($el) {
+    let src = $el.attr('src');
+    let type = src.slice(-3);
 
-        $el.css('padding-bottom', (+$el.attr('height')) / (+$el.attr('width')) * 100 + '%');
+    $el.css('padding-bottom', (+$el.attr('height')) / (+$el.attr('width')) * 100 + '%');
 
-        let $media;
-        let $credit = $C('credit', $el);
-        let $play   = $C('play', $el);
-        let $zoom   = $C('zoom', $el);
-
-
-        // Create Elements
-
-        if (isOneOf(type, 'mp4', 'ogg')) {
-            $media = $N('video', { poster: src.replace(/mp4$/, 'jpg'), src: src }, $el);
-
-            $media._el.preload = true;
-            $media._el.loop = true;
-            $media.on('mouseover touchdown', function() { $media._el.play(); });
-            $media.on('mouseout touchup', function() { $media._el.pause(); });
-
-            $el.addClass('interactive');
-
-        } else if (type == 'gif') {
-            let poster = src.replace(/gif$/, 'png');
-            let img = new Image();
-            img.src = src;
-
-            $media = $N('img', { src: poster }, $el);
-            $media.on('mouseover touchdown', function() { $media.attr('src', src); });
-            $media.on('mouseout touchup', function() { $media.attr('src', poster); });
-
-            $el.addClass('interactive');
-
-        } else {
-            $media = $N('img', { src: src }, $el);
-            $play.remove();
-        }
-
-        $el.prepend($media);
+    let $media;
+    let $credit = $C('credit', $el);
+    let $play   = $C('play', $el);
+    let $zoom   = $C('zoom', $el);
 
 
-        // Captions
+    // Create Elements
 
-        let credit = $el.attr('credit');
-        if (credit) {
-            $credit.text = credit;
-        } else {
-            $credit.remove();
-        }
+    if (isOneOf(type, 'mp4', 'ogg')) {
+      $media = $N('video', { poster: src.replace(/mp4$/, 'jpg'), src: src }, $el);
+
+      $media._el.preload = true;
+      $media._el.loop = true;
+      $media.on('mouseover touchdown', function() { $media._el.play(); });
+      $media.on('mouseout touchup', function() { $media._el.pause(); });
+
+      $el.addClass('interactive');
+
+    } else if (type == 'gif') {
+      let poster = src.replace(/gif$/, 'png');
+      let img = new Image();
+      img.src = src;
+
+      $media = $N('img', { src: poster }, $el);
+      $media.on('mouseover touchdown', function() { $media.attr('src', src); });
+      $media.on('mouseout touchup', function() { $media.attr('src', poster); });
+
+      $el.addClass('interactive');
+
+    } else {
+      $media = $N('img', { src: src }, $el);
+      $play.remove();
+    }
+
+    $el.prepend($media);
 
 
-        // Lightboxes
+    // Captions
 
-        if ($el._el.hasAttribute('lightbox')) {
-            $el.addClass('interactive');
-            let large = src.replace(/\.(?=[^.]*$)/, '-large.');
+    let credit = $el.attr('credit');
+    if (credit) {
+      $credit.text = credit;
+    } else {
+      $credit.remove();
+    }
 
-            let start = null;
-            $el.on('pointerStart', function(e) { start = pointerPosition(e); });
-            $el.on('pointerEnd', function(e) {
-                if (Point.distance(start, pointerPosition(e)) < 10) openLightbox($el, src, large);
-            });
 
-        } else {
-            $zoom.remove();
-        }
+    // Lightboxes
 
-    },
+    if ($el._el.hasAttribute('lightbox')) {
+      $el.addClass('interactive');
+      let large = src.replace(/\.(?=[^.]*$)/, '-large.');
 
-    templateId: '#media'
+      let start = null;
+      $el.on('pointerStart', function(e) { start = pointerPosition(e); });
+      $el.on('pointerEnd', function(e) {
+        if (Point.distance(start, pointerPosition(e)) < 10) openLightbox($el, src, large);
+      });
+
+    } else {
+      $zoom.remove();
+    }
+  },
+
+  templateId: '#media'
 });
