@@ -35,22 +35,24 @@ function showTooltip($target, value, posn) {
   $tooltip.addClass('active');
 }
 
-function makeTooltip($target, value, posn) {
-  $target.on('mouseover', function() {
+function makeTooltip($target, value, posn, delay, action) {
+  $target.on(action == 'mouse' ? 'mouseover' : 'pointerStart', function() {
     if (show || $target.hasClass('active')) return;
     show = $target;
 
     setTimeout(function() {
       if (show === $target) showTooltip($target, value, posn);
-    }, 300);
+    }, delay);
   });
 
-  $target.on('mouseout', function() {
+  $target.on(action == 'mouse' ? 'mouseout' : 'pointerEnd', function() {
+    if (!show) return;
     show = null;
     setTimeout(function() { if (show != $target) hideTooltip(); }, 10);
   });
 
-  $target.on('click', hideTooltip);
+  $target.on('setTooltip', msg => { value = msg; });
+  if (action == 'mouse') $target.on('click', hideTooltip);
 }
 
 $body.on('scroll', hideTooltip);
@@ -62,9 +64,13 @@ export default customElement('x-tooltip', {
 
     let _for = $el.attr('for');
     let posn = $el.attr('class') || 'top';
+    let action = $el.attr('action') || 'mouse';
+
+    let delay = $el.attr('delay');
+    if (delay === null) delay = 300;
 
     let $target = _for ? $(_for) : $el.prev;
-    if ($target) makeTooltip($target, $el.text, posn);
+    if ($target) makeTooltip($target, $el.text, posn, +delay, action);
 
     $el.remove();
   }
