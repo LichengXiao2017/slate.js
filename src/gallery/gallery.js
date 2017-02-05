@@ -18,7 +18,7 @@ export default customElement('x-gallery', {
 
     let $wrapper = $el.find('.wrapper');
     let $panel = $el.find('.panel');
-    let $slides = $panel.children();
+    let $slides = $panel.children;
 
     let $next = $el.find('.next');
     let $back = $el.find('.back');

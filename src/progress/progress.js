@@ -9,7 +9,7 @@ import { $, customElement, $body } from 'elements';
 
 
 function draw() {
-  let $svg = this.$el.children(0);
+  let $svg = this.$el.children[0];
 
   let r = +this.$el.attr('r') || 10;
   let p = +this.$el.attr('p') || 0;
