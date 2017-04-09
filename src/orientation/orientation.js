@@ -19,13 +19,10 @@ export function orientation(callback) {
   let vx = 0, vy = 0;  // Velocity
 
   if (Browser.isMobile && window.DeviceOrientationEvent) {
-    window.addEventListener('deviceorientation', onDeviceOrientation);
+    // window.addEventListener('deviceorientation', onDeviceOrientation);
   } else {
     window.addEventListener('mousemove', onMouseMove);
   }
-
-  requestAnimationFrame(onAnimationFrame);
-  queueCalibration(calibrationDelay);
 
   function onAnimationFrame() {
     vx += (ix - vx) * friction;
@@ -34,6 +31,7 @@ export function orientation(callback) {
     callback(-vx, -vy);
     requestAnimationFrame(onAnimationFrame);
   }
+  requestAnimationFrame(onAnimationFrame);
 
   function onDeviceOrientation(event) {
     let newPortrait = Browser.height > Browser.width;
