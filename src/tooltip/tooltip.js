@@ -21,6 +21,7 @@ function showTooltip($target, value, posn) {
   $tooltip.attr('class', 'tooltip ' + posn);
 
   // TODO fit to window dimensions, maybe scroll?
+  // TODO this sometimes doesn't work...
   let bounds = $target.bounds;
 
   let x = (posn == 'left') ? bounds.left - $tooltip.width - 8 :
@@ -35,26 +36,6 @@ function showTooltip($target, value, posn) {
   $tooltip.addClass('active');
 }
 
-function makeTooltip($target, value, posn, delay, action) {
-  $target.on(action == 'mouse' ? 'mouseover' : 'pointerStart', function() {
-    if (show || $target.hasClass('active')) return;
-    show = $target;
-
-    setTimeout(function() {
-      if (show === $target) showTooltip($target, value, posn);
-    }, delay);
-  });
-
-  $target.on(action == 'mouse' ? 'mouseout' : 'pointerEnd', function() {
-    if (!show) return;
-    show = null;
-    setTimeout(function() { if (show != $target) hideTooltip(); }, 10);
-  });
-
-  $target.on('setTooltip', msg => { value = msg; });
-  if (action == 'mouse') $target.on('click', hideTooltip);
-}
-
 $body.on('scroll', hideTooltip);
 
 // -----------------------------------------------------------------------------
@@ -63,15 +44,34 @@ export default customElement('x-tooltip', {
   created($el) {
 
     let _for = $el.attr('for');
+    let $target = _for ? $(_for) : $el.prev;
+
     let posn = $el.attr('class') || 'top';
-    let action = $el.attr('action') || 'mouse';
+    let touch = $el.hasAttribute('touch');
+    let value = $el.text;
 
     let delay = $el.attr('delay');
     if (delay === null) delay = 300;
 
-    let $target = _for ? $(_for) : $el.prev;
-    if ($target) makeTooltip($target, $el.text, posn, +delay, action);
-
     $el.remove();
+    if (!$target) return;
+
+    $target.on('mouseover' + (touch ? ' touchstart' : ''), function() {
+      if (show || $target.hasClass('active')) return;
+      show = $target;
+
+      setTimeout(function() {
+        if (show === $target) showTooltip($target, value, posn);
+      }, +delay);
+    });
+
+    $target.on('mouseout' + (touch ? ' touchend' : ''), function() {
+      if (!show) return;
+      show = null;
+      setTimeout(function() { if (show != $target) hideTooltip(); }, 10);
+    });
+
+    $target.on('setTooltip', msg => { value = msg; });
+    if (!touch) $target.on('mouseup', hideTooltip);
   }
 });

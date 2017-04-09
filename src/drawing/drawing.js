@@ -25,20 +25,22 @@ export default class Drawing extends Evented {
     this.p = null;
     this.activePath = null;
 
+    $svg.css('touch-action', 'none');
+
     if (!options.noStart) {
-      $svg.on('pointerStart', e => {
+      $svg.on('pointerdown', e => {
         stopEvent(e);
         this.start(svgPointerPosn(event, $svg));
       });
     }
 
-    $svg.on('pointerMove', e => {
+    $svg.on('pointermove', e => {
       if (!this.drawing) return;
       stopEvent(e);
       this.addPoint(svgPointerPosn(event, $svg));
     });
 
-    $svg.on('pointerEnd', () => {
+    $svg.on('pointerstop', () => {
       this.trigger('end');
       this.drawing = false;
     });
