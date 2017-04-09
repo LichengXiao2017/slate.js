@@ -89,18 +89,21 @@ export default customElement('x-media', {
     let src = $el.attr('src');
     let type = src.slice(-3);
 
-    $el.css('padding-bottom', (+$el.attr('height')) / (+$el.attr('width')) * 100 + '%');
+    let $wrap = $el.$('.wrap');
+
+    $el.css('width', $el.attr('width') + 'px');
+    $wrap.css('padding-bottom', (+$el.attr('height')) / (+$el.attr('width')) * 100 + '%');
 
     let $media;
-    let $credit = $C('credit', $el);
-    let $play   = $C('play', $el);
-    let $zoom   = $C('zoom', $el);
+    let $credit = $C('credit', $wrap);
+    let $play   = $C('play', $wrap);
+    let $zoom   = $C('zoom', $wrap);
 
 
     // Create Elements
 
     if (isOneOf(type, 'mp4', 'ogg')) {
-      $media = $N('video', { poster: src.replace(/mp4$/, 'jpg'), src: src }, $el);
+      $media = $N('video', { poster: src.replace(/mp4$/, 'jpg'), src: src });
 
       $media._el.preload = true;
       $media._el.loop = true;
@@ -114,18 +117,18 @@ export default customElement('x-media', {
       let img = new Image();
       img.src = src;
 
-      $media = $N('img', { src: poster }, $el);
+      $media = $N('img', { src: poster });
       $media.on('mouseover touchdown', function() { $media.attr('src', src); });
       $media.on('mouseout touchup', function() { $media.attr('src', poster); });
 
       $el.addClass('interactive');
 
     } else {
-      $media = $N('img', { src: src }, $el);
+      $media = $N('img', { src: src });
       $play.remove();
     }
 
-    $el.prepend($media);
+    $wrap.prepend($media);
 
 
     // Captions
@@ -145,8 +148,8 @@ export default customElement('x-media', {
       let large = src.replace(/\.(?=[^.]*$)/, '-large.');
 
       let start = null;
-      $el.on('pointerStart', function(e) { start = pointerPosition(e); });
-      $el.on('pointerEnd', function(e) {
+      $el.on('pointerdown', function(e) { start = pointerPosition(e); });
+      $el.on('pointerstop', function(e) {
         if (Point.distance(start, pointerPosition(e)) < 10) openLightbox($el, src, large);
       });
 
