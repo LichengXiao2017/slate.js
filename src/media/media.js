@@ -107,8 +107,12 @@ export default customElement('x-media', {
 
       $media._el.preload = true;
       $media._el.loop = true;
-      $media.on('mouseover touchdown', function() { $media._el.play(); });
-      $media.on('mouseout touchup', function() { $media._el.pause(); });
+      $media._el.muted = true;
+      $media.attr('muted', 'true');
+      $media.attr('playsinline', 'true');  // For iOS
+
+      $media.on('pointerdown', function() { $media._el.play(); });
+      $media.on('pointerstop', function() { $media._el.pause(); });
 
       $el.addClass('interactive');
 
@@ -118,8 +122,8 @@ export default customElement('x-media', {
       img.src = src;
 
       $media = $N('img', { src: poster });
-      $media.on('mouseover touchdown', function() { $media.attr('src', src); });
-      $media.on('mouseout touchup', function() { $media.attr('src', poster); });
+      $media.on('pointerdown', function() { $media.attr('src', src); });
+      $media.on('pointerstop', function() { $media.attr('src', poster); });
 
       $el.addClass('interactive');
 
@@ -146,13 +150,7 @@ export default customElement('x-media', {
     if ($el._el.hasAttribute('lightbox')) {
       $el.addClass('interactive');
       let large = src.replace(/\.(?=[^.]*$)/, '-large.');
-
-      let start = null;
-      $el.on('pointerdown', function(e) { start = pointerPosition(e); });
-      $el.on('pointerstop', function(e) {
-        if (Point.distance(start, pointerPosition(e)) < 10) openLightbox($el, src, large);
-      });
-
+      $el.on('click', function() { openLightbox($el, src, large); });
     } else {
       $zoom.remove();
     }
