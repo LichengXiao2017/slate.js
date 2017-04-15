@@ -5,13 +5,14 @@
 
 
 
+// TODO allow custom containers
+
 import { $, $body, customElement } from 'elements';
 import Browser from 'browser';
 
 
 const MARGIN = 15;
 const MARGINTOP = 50;
-const $container = $body;
 
 export default customElement('x-popup', {
 
@@ -22,6 +23,8 @@ export default customElement('x-popup', {
     let $target = $el.find('.target');
     let $box = $el.find('.popup');
     let $bubble = $el.find('.body');
+
+    let $container = $($el.attr('container')) || $body;
 
     this.open = function() {
       if (isOpen) return;
@@ -36,19 +39,18 @@ export default customElement('x-popup', {
       let left = bounds.left - bounds.width/2;
       let right = bounds.right + bounds.width/2;
 
-      let pageLeft = $container ? $container.offsetLeft : 0;
-      let pageRight = $container ? $container.offsetRight : $body.width;
-
+      let pageLeft = $container.offsetLeft;
       if (left < pageLeft + MARGIN)
         $bubble.translateX(pageLeft + MARGIN - left);
 
+      let pageRight = pageLeft + $container.width;
       if (right > pageRight - MARGIN)
         $bubble.translateX(pageRight - MARGIN - right);
 
       Browser.redraw();
       if (top < MARGINTOP ) { $body.scrollBy(top - MARGINTOP); }
 
-      $el.addClass('on');
+      $target.addClass('on');
       $box.addClass('on');
     };
 
@@ -56,7 +58,7 @@ export default customElement('x-popup', {
       if (!isOpen) return;
       isOpen = false;
 
-      $el.removeClass('on');
+      $target.removeClass('on');
       $box.removeClass('on');
       setTimeout( function(){ $box.hide(); }, 200);
     };
