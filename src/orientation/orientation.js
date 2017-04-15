@@ -5,13 +5,14 @@
 
 
 
+import { round } from 'arithmetic';
 import { clamp } from 'utilities';
 import Browser from 'browser';
 
 
 export function orientation(callback) {
   let magicNumber = 20;  // Angle that counts as +/- 1
-  let friction = 0.05;
+  let friction = 0.1;
   let portrait = null;
 
   let cx = 0, cy = 0;  // Calibration
@@ -25,10 +26,11 @@ export function orientation(callback) {
   }
 
   function onAnimationFrame() {
-    vx += (ix - vx) * friction;
-    vy += (iy - vy) * friction;
+    let vxOld = vx, vyOld = vy;
+    vx = round(vx + (ix - vx) * friction, 3);
+    vy = round(vy + (iy - vy) * friction, 3);
 
-    callback(-vx, -vy);
+    if (vx != vxOld || vy != vyOld) callback(-vx, -vy);
     requestAnimationFrame(onAnimationFrame);
   }
   requestAnimationFrame(onAnimationFrame);

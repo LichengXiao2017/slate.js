@@ -5,6 +5,8 @@
 
 
 
+// TODO Improve scroll performance on very low-end devices.
+
 import { customElement, $body } from 'elements';
 import Browser from 'browser';
 
