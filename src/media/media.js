@@ -111,8 +111,8 @@ export default customElement('x-media', {
       $media.attr('muted', 'true');
       $media.attr('playsinline', 'true');  // For iOS
 
-      $media.on('pointerdown', function() { $media._el.play(); });
-      $media.on('pointerstop', function() { $media._el.pause(); });
+      $media.on('mouseover touchdown', function() { $media._el.play(); });
+      $media.on('mouseout touchup', function() { $media._el.pause(); });
 
       $el.addClass('interactive');
 
@@ -122,8 +122,8 @@ export default customElement('x-media', {
       img.src = src;
 
       $media = $N('img', { src: poster });
-      $media.on('pointerdown', function() { $media.attr('src', src); });
-      $media.on('pointerstop', function() { $media.attr('src', poster); });
+      $media.on('mouseover touchdown', function() { $media.attr('src', src); });
+      $media.on('mouseout touchup', function() { $media.attr('src', poster); });
 
       $el.addClass('interactive');
 
