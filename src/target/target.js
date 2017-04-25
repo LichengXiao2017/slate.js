@@ -104,7 +104,9 @@ export default customElement('x-target', {
 
     function exit(e) {
       if (!active) return;
-      if (e.type == 'mousemove' && distance(start, [e.clientX, e.clientY ]) < 40) return;
+
+      let moveEvent = e.type === 'mousemove' || e.type === 'pointermove';
+      if (moveEvent && distance(start, [e.clientX, e.clientY ]) < 40) return;
 
       clearTimeout(showTimeout);
       active = false;
@@ -116,28 +118,33 @@ export default customElement('x-target', {
       $el.off('mouseleave', exit);
     }
 
-    $el.on('mouseenter touchstart', function(e) {
-      start = [e.clientX, e.clientY];
-      enter();
-      showTimeout = setTimeout(show, scroll ? 50 : 30);
-
+    function bindExit() {
       if (scroll && !sourceFixed) {
         $body.on('mousemove', exit);
       } else {
         $el.on('mouseleave', exit);
       }
       $body.on('mousewheel touchend touchmove', exit);
+    }
+
+    $el.on('mouseenter touchstart', function(e) {
+      start = [e.clientX, e.clientY];
+      enter();
+      showTimeout = setTimeout(show, scroll ? 50 : 30);
+      bindExit();
     });
 
     $el.on('click', function(e) {
       if (active) {
-        $(query).trigger('click mousedown');
         e.handled = true;
         exit({});
+        // Timeout, so that clickOutside is triggered after click.
+        setTimeout(function() { $(query).trigger('click mousedown'); });
       } else {
         active = true;
         scroll = 0;
         show();
+        bindExit();
       }
     });
 
