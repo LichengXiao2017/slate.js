@@ -30,14 +30,14 @@ export default class Drawing extends Evented {
     if (!options.noStart) {
       $svg.on('pointerdown', e => {
         stopEvent(e);
-        this.start(svgPointerPosn(event, $svg));
+        this.start(svgPointerPosn(e, $svg));
       });
     }
 
     $svg.on('pointermove', e => {
       if (!this.drawing) return;
       stopEvent(e);
-      this.addPoint(svgPointerPosn(event, $svg));
+      this.addPoint(svgPointerPosn(e, $svg));
     });
 
     $svg.on('pointerstop', () => {

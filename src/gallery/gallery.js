@@ -138,6 +138,7 @@ export default customElement('x-gallery', {
             newPosition;
 
         setPosition(x);
+        $el.css('pointer-events', 'none');
       },
       end: function() {
         let lastDiff = lastMotionX - previousMotionX;
@@ -146,6 +147,7 @@ export default customElement('x-gallery', {
         animTiming = 'quad-out';
         startAnimationTo(clamp(Math.round(-translateX/slideWidth - shift), 0,
           slidesCount - slidesPerPage));
+        setTimeout(function() { $el.css('pointer-events', 'auto'); });
       }
     });
 
