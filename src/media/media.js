@@ -1,15 +1,12 @@
 // =============================================================================
-// Slate.js | Media Elements
-// (c) 2017 Mathigon
+// Slate.js | Media Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { isOneOf } from 'utilities';
-import { $C, $N, customElement, $body } from 'elements';
-import { pointerPosition } from 'events';
-import { Point } from 'geometry';
-import Browser from 'browser';
+import { isOneOf } from '@mathigon/core';
+import { $C, $N, customElement, $body, Browser } from '@mathigon/boost';
 
 
 // -----------------------------------------------------------------------------
@@ -83,7 +80,7 @@ Browser.onKey('space up down left right pagedown pageup', function(e) {
 // -----------------------------------------------------------------------------
 // Media Elements
 
-export default customElement('x-media', {
+export const Media =  customElement('x-media', {
 
   created($el) {
     let src = $el.attr('src');

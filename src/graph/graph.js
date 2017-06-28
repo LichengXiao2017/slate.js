@@ -1,22 +1,17 @@
 // =============================================================================
-// Mathigon.org | Graph Class
-// (c) 2017 Mathigon
+// Mathigon.org | Graph Component
+// (c) Mathigon
 // =============================================================================
 
 
-import { $N } from 'elements';
-import { slide } from 'events';
-import { nearlyEquals } from 'arithmetic';
-import { square, run, clamp } from 'utilities';
-import { Point } from 'geometry';
-import { list } from 'arrays';
-import Vector from 'vector';
-import Evented from 'evented';
+import { square, run, clamp, list, Evented } from '@mathigon/core';
+import { nearlyEquals, Point, Vector } from '@mathigon/fermat';
+import { $N, slide } from '@mathigon/boost';
 
 
 function V(...args) { return new Vector(...args); }
 
-export default class Graph extends Evented {
+export class Graph extends Evented {
 
   constructor($svg, vertices, edges, options = {}) {
     super();
@@ -94,7 +89,7 @@ export default class Graph extends Evented {
       let $el = _this.options.icon ?
         $N('path', { 'class': 'node', d: _this.options.icon }, _this.$vertices) :
         $N('circle', { 'class': 'node', r: _this.options.r || 5 }, _this.$vertices);
-      if (_this.options.vertex) $el.css('fill', run(_this.options.vertex, [v]));
+      if (_this.options.vertex) $el.css('fill', run(_this.options.vertex, v));
       return { $el: $el, posn: { x: x, y: y }, neighbours: [], v: { x: 0, y: 0 } };
     });
 
@@ -105,7 +100,7 @@ export default class Graph extends Evented {
       let type = (v1 === v2) || _this.options.arc ? 'path' : 'line';
       let $el = $N(type, { 'class': 'link' }, _this.$edges);
       if (_this.options.directed) $el.attr('marker-end', 'url(#arrow-head)');
-      if (_this.options.edge) $el.css('stroke', run(_this.options.edge, [e[0], e[1]]));
+      if (_this.options.edge) $el.css('stroke', run(_this.options.edge, e[0], e[1]));
 
       let edge = { $el: $el, vertices: [v1, v2] };
 

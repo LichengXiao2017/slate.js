@@ -1,19 +1,15 @@
 // =============================================================================
-// Slate.js | Draggable
-// (c) 2017 Mathigon
+// Slate.js | Draggable Component
+// (c) Mathigon
 // =============================================================================
 
 
-
-import { $body } from 'elements';
-import Evented from 'evented';
-import Browser from 'browser';
-import { clamp } from 'utilities';
-import { slide } from 'events';
-import { roundTo } from 'arithmetic';
+import { Evented, clamp } from '@mathigon/core';
+import { roundTo } from '@mathigon/fermat';
+import { $body, Browser, slide } from '@mathigon/boost';
 
 
-export default class Draggable extends Evented {
+export class Draggable extends Evented {
 
   constructor($el, $parent, direction = '', margin = 0, useTransform = false, snap = null) {
     super();

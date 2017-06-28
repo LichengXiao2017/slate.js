@@ -1,17 +1,17 @@
 // =============================================================================
-// Slate.js | Targets
-// (c) 2017 Mathigon
+// Slate.js | Target Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { delay } from 'utilities';
-import { projectPointOnRect } from 'geometry';
-import { $, $N, $$, customElement, $body } from 'elements';
-import Browser from 'browser';
+import { delay } from '@mathigon/core';
+import { projectPointOnRect } from '@mathigon/fermat';
+import { $, $N, $$, customElement, $body, Browser } from '@mathigon/boost';
 
 
-const $fixed = $$('x-toolbox, header, .toast-panel');  // TODO make this mathigon-independent
+// TODO make this mathigon-independent
+const $fixed = $$('x-toolbox, header, .toast-panel');
 
 const $targets = $N('svg', {
   'class': 'target-body',
@@ -46,7 +46,7 @@ let active = false;
 let $bounds = [];
 
 
-export default customElement('x-target', {
+export const Target = customElement('x-target', {
 
   created($el) {
     let query = $el.attr('to');

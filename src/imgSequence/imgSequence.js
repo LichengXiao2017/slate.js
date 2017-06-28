@@ -1,16 +1,15 @@
 // =============================================================================
-// Slate.js | Image Sequence
-// (c) 2017 Mathigon
+// Slate.js | Image Sequence Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { $N, customElement } from 'elements';
-import { tabulate } from 'arrays';
-import xSlider from 'slider';  // Unused Import.
+import { tabulate } from '@mathigon/core';
+import { $N, customElement } from '@mathigon/boost';
 
 
-export default customElement('x-img-sequence', {
+export const ImgSequence = customElement('x-img-sequence', {
 
   created: function($el) {
     let url = $el.attr('src');

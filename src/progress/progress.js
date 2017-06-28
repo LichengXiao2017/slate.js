@@ -1,11 +1,11 @@
 // =============================================================================
-// Slate.js | Progress
-// (c) 2017 Mathigon
+// Slate.js | Progress Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { $, customElement, $body } from 'elements';
+import { customElement } from '@mathigon/boost';
 
 
 function draw() {
@@ -43,7 +43,7 @@ function draw() {
 }
 
 
-export default customElement('x-progress', {
+export const Progress = customElement('x-progress', {
 
   attached: draw,
   draw: draw,

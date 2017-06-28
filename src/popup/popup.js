@@ -1,14 +1,13 @@
 // =============================================================================
-// Slate.js | Popups
-// (c) 2017 Mathigon
+// Slate.js | Popup Component
+// (c) Mathigon
 // =============================================================================
 
 
 
 // TODO allow custom containers
 
-import { $, $body, customElement } from 'elements';
-import Browser from 'browser';
+import { $, $body, customElement, Browser } from '@mathigon/boost';
 
 
 const MARGIN = 15;

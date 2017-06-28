@@ -1,13 +1,13 @@
 // =============================================================================
 // Slate.js | Orientation Events
-// (c) 2017 Mathigon
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { round } from 'arithmetic';
-import { clamp } from 'utilities';
-import Browser from 'browser';
+import { clamp } from '@mathigon/core';
+import { round } from '@mathigon/fermat';
+import { Browser } from '@mathigon/boost';
 
 
 export function orientation(callback) {

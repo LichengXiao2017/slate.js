@@ -1,15 +1,15 @@
 // =============================================================================
-// Slate.js | Slider
-// (c) 2017 Mathigon
+// Slate.js | Slider Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { $C, customElement } from 'elements';
-import Draggable from 'draggable';
+import { $C, customElement } from '@mathigon/boost';
+import { Draggable } from '../draggable/draggable';
 
 
-export default customElement('x-slider', {
+export const Slider = customElement('x-slider', {
 
   created($track) {
     let $knob = $C('knob', $track);

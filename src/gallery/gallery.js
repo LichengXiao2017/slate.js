@@ -1,18 +1,15 @@
 // =============================================================================
-// Slate.js | Gallery
-// (c) 2015 Mathigon
+// Slate.js | Gallery Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { clamp } from 'utilities';
-import { $N, customElement, $body } from 'elements';
-import { ease } from 'animate';
-import Browser from 'browser';
-import { slide } from 'events';
+import { clamp } from '@mathigon/core';
+import { Browser, $N, customElement, $body, ease, slide } from '@mathigon/boost';
 
 
-export default customElement('x-gallery', {
+export const Gallery = customElement('x-gallery', {
 
   created($el) {
 

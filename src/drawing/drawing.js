@@ -1,18 +1,16 @@
 // =============================================================================
-// Slate.js | Drawing
-// (c) 2017 Mathigon
+// Slate.js | Drawing Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import Evented from 'evented';
-import { last } from 'arrays';
-import { $N } from 'elements';
-import { Point, Line, lineLineIntersect } from 'geometry';
-import { svgPointerPosn, stopEvent } from 'events';
+import { Evented, last } from '@mathigon/core';
+import { Point, Line, lineLineIntersect } from '@mathigon/fermat';
+import { $N, svgPointerPosn, stopEvent } from '@mathigon/boost';
 
 
-export default class Drawing extends Evented {
+export class Drawing extends Evented {
 
   constructor($svg, options = {}) {
     super();

@@ -1,17 +1,16 @@
 // =============================================================================
-// Slate.js | Parallax
-// (c) 2017 Mathigon
+// Slate.js | Parallax Component
+// (c) Mathigon
 // =============================================================================
 
 
 
 // TODO Improve scroll performance on very low-end devices.
 
-import { customElement, $body } from 'elements';
-import Browser from 'browser';
+import { customElement, $body, Browser } from '@mathigon/boost';
 
 
-export default customElement('x-parallax', {
+export const Parallax = customElement('x-parallax', {
 
   created($el) {
     // TODO allow animation of multiple properties

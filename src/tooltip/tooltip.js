@@ -1,11 +1,11 @@
 // =============================================================================
-// Slate.js | Tooltip Element
-// (c) 2017 Mathigon
+// Slate.js | Tooltip Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { $, $N, customElement, $body } from 'elements';
+import { $, $N, customElement, $body } from '@mathigon/boost';
 
 const $tooltip = $N('div', { class: 'tooltip'}, $body);
 let show = null;
@@ -40,7 +40,7 @@ $body.on('scroll', hideTooltip);
 
 // -----------------------------------------------------------------------------
 
-export default customElement('x-tooltip', {
+export const Tooltip = customElement('x-tooltip', {
   created($el) {
 
     let _for = $el.attr('for');

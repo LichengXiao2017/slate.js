@@ -1,14 +1,14 @@
 // =============================================================================
-// Slate.js | Dropdown
-// (c) 2017 Mathigon
+// Slate.js | Dropdown Component
+// (c) Mathigon
 // =============================================================================
 
 
 
-import { customElement } from 'elements';
+import { customElement } from '@mathigon/boost';
 
 
-export default customElement('x-dropdown', {
+export const Dropdown = customElement('x-dropdown', {
 
   created($el) {
     this.$title = $el.find('.dropdown-title');
