@@ -6,7 +6,7 @@
 
 
 import { clamp } from '@mathigon/core';
-import { Browser, $N, customElement, $body, ease, slide } from '@mathigon/boost';
+import { Browser, $N, customElement, ease, slide } from '@mathigon/boost';
 
 
 export const Gallery = customElement('x-gallery', {
@@ -21,7 +21,7 @@ export const Gallery = customElement('x-gallery', {
     let $back = $el.find('.back');
 
     let $dotsBox = $el.find('.dots');
-    let $dots = $slides.map(x => $N('div', { class: 'dot' }, $dotsBox));
+    let $dots = $slides.map(_ => $N('div', { class: 'dot' }, $dotsBox));
 
 
     // ---------------------------------------------------------------------
@@ -156,11 +156,11 @@ export const Gallery = customElement('x-gallery', {
     this.back = back;
   },
 
-  attached($el) {
+  attached(_$el) {
     // TODO add event listener
   },
 
-  detached($el) {
+  detached(_$el) {
     // TODO remove body event listener
   },
 

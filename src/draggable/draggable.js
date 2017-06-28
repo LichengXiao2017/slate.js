@@ -6,7 +6,7 @@
 
 import { Evented, clamp } from '@mathigon/core';
 import { roundTo } from '@mathigon/fermat';
-import { $body, Browser, slide } from '@mathigon/boost';
+import { Browser, slide } from '@mathigon/boost';
 
 
 export class Draggable extends Evented {

@@ -24,7 +24,7 @@ export const Dropdown = customElement('x-dropdown', {
     $el.on('clickOutside', () => { this.hide(); });
   },
 
-  detached($el) {
+  detached(_$el) {
     // TODO remove body event listener
   },
 

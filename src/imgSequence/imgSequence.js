@@ -20,7 +20,7 @@ export const ImgSequence = customElement('x-img-sequence', {
     let $slider = $N('x-slider', { steps: pages }, $el);
 
     // preload images
-    let images = tabulate(i => new Image(), pages);
+    let images = tabulate(_ => new Image(), pages);
     images.forEach((img, i) => { img.src = url.replace('#', i); });
 
     function draw(n) {

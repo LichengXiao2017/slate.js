@@ -49,7 +49,7 @@ export const Parallax = customElement('x-parallax', {
     $body.on('scroll', scroll);
   },
 
-  detached($el) {
+  detached(_$el) {
     // TODO remove body event listener
   },
 

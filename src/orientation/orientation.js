@@ -5,17 +5,17 @@
 
 
 
-import { clamp } from '@mathigon/core';
+// import { clamp } from '@mathigon/core';
 import { round } from '@mathigon/fermat';
 import { Browser } from '@mathigon/boost';
 
 
 export function orientation(callback) {
-  let magicNumber = 20;  // Angle that counts as +/- 1
+  // let magicNumber = 20;  // Angle that counts as +/- 1
   let friction = 0.1;
-  let portrait = null;
+  // let portrait = null;
 
-  let cx = 0, cy = 0;  // Calibration
+  // let cx = 0, cy = 0;  // Calibration
   let ix = 0, iy = 0;  // Input
   let vx = 0, vy = 0;  // Velocity
 
@@ -35,7 +35,7 @@ export function orientation(callback) {
   }
   requestAnimationFrame(onAnimationFrame);
 
-  function onDeviceOrientation(event) {
+  /* function onDeviceOrientation(event) {
     let newPortrait = Browser.height > Browser.width;
     if (portrait !== newPortrait) {
       portrait = newPortrait;
@@ -46,7 +46,7 @@ export function orientation(callback) {
     ix = -clamp((event.beta - cx) / magicNumber, -1, 1);
     iy = -clamp((event.gamma - cy) / magicNumber, -1, 1);
     if (portrait) [ix, iy] = [iy, ix];
-  }
+  } */
 
   function onMouseMove(event) {
     ix = event.clientX / Browser.width * 2 - 1;
