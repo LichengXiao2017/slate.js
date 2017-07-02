@@ -1,6 +1,6 @@
 {
   "name": "@mathigon/slate",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Custom web components including media, popups, sliders, SVGs and more.",
   "keywords": [
     "web component"
