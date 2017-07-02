@@ -13,7 +13,7 @@ import { $, $body, customElement, Browser } from '@mathigon/boost';
 const MARGIN = 15;
 const MARGINTOP = 50;
 
-export default customElement('x-popup', {
+export const Popup = customElement('x-popup', {
 
   created($el) {
     let _this = this;
